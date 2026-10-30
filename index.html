@@ -18,11 +18,15 @@
     /* Chat actions, pinned content, and media capture */
     .chat-row{backdrop-filter:blur(16px) saturate(1.35);-webkit-backdrop-filter:blur(16px) saturate(1.35);touch-action:pan-y}
     .dark .chat-row{backdrop-filter:blur(18px) saturate(1.25);-webkit-backdrop-filter:blur(18px) saturate(1.25)}
-    .chat-row-wrap{position:relative;display:block;overflow:hidden;border-radius:20px;touch-action:pan-y}
-    .chat-row{position:relative;z-index:1;width:100%;transition:transform .24s cubic-bezier(.2,.75,.25,1),background-color .16s,border-color .16s}
+    .chat-row,.chat-row:hover{background:#f7f7f9!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+    .chat-row.selected{background:#e5e5e9!important}
+    .dark .chat-row,.dark .chat-row:hover{background:#27282d!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+    .dark .chat-row.selected{background:#36373d!important}
+    .chat-row-wrap{position:relative;display:block;overflow:hidden;border-radius:20px;isolation:isolate;touch-action:pan-y}
+    .chat-row{position:relative;z-index:2;width:100%;transition:transform .24s cubic-bezier(.2,.75,.25,1),background-color .16s,border-color .16s}
     .chat-row.swiping{transition:none}
     .chat-row-wrap.revealed .chat-row,.chat-row-wrap:has(.chat-action-btn:focus-visible) .chat-row{transform:translateX(-132px)}
-    .chat-row-actions{position:absolute;z-index:2;inset:0 0 0 auto;width:128px;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-left:4px}
+    .chat-row-actions{position:absolute;z-index:1;inset:0 0 0 auto;width:128px;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-left:4px}
     .chat-action-btn{display:grid;place-items:center;align-content:center;gap:4px;min-width:0;height:100%;border-radius:15px;background:rgba(90,91,98,.16);color:var(--ink);font-size:10px;backdrop-filter:blur(12px)}
     .chat-action-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .chat-action-btn.delete{background:#d65360;color:white}
@@ -70,12 +74,98 @@
     .video-note-unavailable{width:170px;height:170px;border:1px dashed var(--line);border-radius:50%;display:grid;place-items:center;padding:22px;text-align:center;color:var(--muted);font-size:12px;background:var(--surface-2)}
     @media(max-width:700px){.msg-actions{display:block;position:absolute;top:-11px;right:4px;margin:0;pointer-events:auto}.msg-actions .msg-more{width:27px;height:25px;opacity:.78;pointer-events:auto}.msg-actions.open .msg-more{opacity:1}}
     @media(max-width:700px){.video-note-unavailable{width:min(190px,48vw);height:min(190px,48vw)}}
+    .segmented{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+    .chat-list{touch-action:pan-y}
+    .floating-day{position:sticky;top:8px;z-index:8;align-self:center;flex:0 0 26px;height:26px;margin:0 0 -14px;pointer-events:none}
+    .floating-day span{display:inline-flex;align-items:center;justify-content:center;min-height:26px;padding:5px 13px;border:1px solid var(--line);border-radius:999px;background:var(--glass);backdrop-filter:blur(22px) saturate(1.45);-webkit-backdrop-filter:blur(22px) saturate(1.45);box-shadow:0 5px 18px #00000012;color:var(--muted);font-size:11px;white-space:nowrap;transition:opacity .14s,transform .14s}
+    .floating-day[hidden]{display:none}
+    .floating-day.changed span{animation:datePillChange .18s ease-out}
+    @keyframes datePillChange{from{opacity:.45;transform:translateY(-3px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .segmented button{transition:background-color .18s,color .18s,box-shadow .18s}
+    .chat-row-wrap.filter-enter{animation:filterRowEnter .2s cubic-bezier(.2,.75,.25,1) both}
+    @keyframes filterRowEnter{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+    .conv-status{color:var(--muted)}
+    .conversation{height:calc(100vh - 44px);min-height:0}
+    .conv-head{flex:0 0 78px}
+    .messages{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+    .composer-wrap{flex:none}
+    @media(max-width:1000px) and (min-width:701px){.conversation{height:calc(100vh - 24px)}}
+    @media(max-width:700px){.conversation.page-open{height:100dvh;min-height:0;overscroll-behavior:contain}.conv-head{flex-basis:78px}.messages{min-height:0}}
+    @media(hover:none){.msg-actions .msg-more{opacity:0;pointer-events:none}.msg-line.actions-visible .msg-actions .msg-more,.msg-actions.open .msg-more,.msg-actions:focus-within .msg-more{opacity:.82;pointer-events:auto}}
+    @media(hover:hover){.msg-actions .msg-more{opacity:0;pointer-events:none}.bubble:hover .msg-actions .msg-more,.msg-actions:focus-within .msg-more,.msg-actions.open .msg-more{opacity:.82;pointer-events:auto}}
+    .dark .rail{border-color:rgba(255,255,255,.46)}
+    .chat-search-panel{display:flex;align-items:center;gap:7px;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--glass);backdrop-filter:blur(18px) saturate(1.3)}
+    .chat-search-panel[hidden]{display:none}
+    .chat-search-panel .search{flex:1;min-width:0;height:36px}
+    .chat-search-panel .search input{font-size:12px}
+    .chat-search-count{min-width:60px;text-align:center;color:var(--muted);font-size:10px;white-space:nowrap}
+    .chat-search-nav{width:32px;height:32px;flex:none;font-size:14px}
+    .msg-line.search-match .bubble{outline:2px solid rgba(130,135,160,.72);outline-offset:2px}
+    .msg-line.search-current .bubble{outline-color:#8c91ad;box-shadow:0 0 0 4px rgba(140,145,173,.16)}
+    .record-camera-switch{position:absolute;z-index:3;top:16px;left:16px;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:1px solid #ffffff55;background:#20212688;color:#fff;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+    .bubble{white-space:pre-wrap;overflow-wrap:anywhere}
+    .composer textarea{line-height:20px;padding-top:10px;padding-bottom:10px;min-height:44px;max-height:102px}
+    .record-camera-switch svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .record-camera-switch:disabled{opacity:.5;cursor:wait}
+    .video-record-limit{margin-top:-14px;color:var(--muted);font-size:12px}
+    .owner-participants-row{width:100%;text-align:left;background:transparent;cursor:pointer;transition:color .18s ease,background-color .18s ease}
+    .owner-participants-row:hover{color:var(--accent);background:var(--surface-2)}
+    .directory-list{padding:8px 20px}
+    .directory-user{display:flex;align-items:center;gap:12px;width:100%;padding:12px 0;text-align:left;background:transparent;border-bottom:1px solid var(--line);transition:background-color .18s ease}
+    .directory-user:last-child{border-bottom:0}
+    .directory-user:hover{background:var(--surface-2)}
+    .directory-user .avatar{width:42px;height:42px}
+    .directory-user-meta{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+    .directory-user-meta strong{font-size:13px}
+    .directory-user-meta small{font-size:11px;color:var(--muted)}
+    .registration-toggle{cursor:pointer;transition:background-color .18s ease,color .18s ease,transform .18s ease}
+    .registration-toggle:hover{background:var(--accent);color:#fff;transform:translateY(-1px)}
+    .auth-registration-closed{margin:15px 0 0;color:var(--muted);font-size:12px;text-align:center}
+    .video-playback-circle video{cursor:pointer}
+    #videoPreview.rear-camera{transform:none}
+    @media(min-width:701px){.shell.chat-open .conversation.page-open{height:calc(100vh - 44px);min-height:0}}
+    @media(max-width:1000px) and (min-width:701px){.shell.chat-open .conversation.page-open{height:calc(100vh - 24px)}}
+    .messages{background:radial-gradient(ellipse at 52% 105%,#080806 0,transparent 60%)}
+    .dark .messages{background:radial-gradient(ellipse at 52% 105%,#f7f7f9 0,transparent 60%)}
+    .composer-wrap{border-top:0}
+    .composer textarea{background:rgba(247,247,249,.34);transition:background-color .2s ease,border-color .2s ease}
+    .dark .composer textarea{background:rgba(39,40,45,.34)}
+    .forward-chat-list{display:grid;gap:6px;max-height:min(45vh,320px);overflow:auto;margin:12px 0;overscroll-behavior:contain}
+    .forward-chat-option{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;text-align:left;border:1px solid var(--line);border-radius:15px;background:var(--surface-2);transition:background-color .18s ease,transform .18s ease}
+    .forward-chat-option:hover{background:var(--glass);transform:translateY(-1px)}
+    .forward-chat-option .avatar{width:34px;height:34px;font-size:11px}
+    .forward-chat-option small{display:block;margin-top:3px;color:var(--muted);font-size:10px}
+    .forwarded-from{display:flex;align-items:baseline;gap:4px;margin:0 0 6px;color:var(--muted);font-size:10px;font-weight:600}
+    .forwarded-from button{padding:0;background:transparent;color:inherit;font-size:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+    .forwarded-from button:hover{color:var(--ink)}
+    .forward-author-link{padding:0;background:transparent;color:var(--ink);font-weight:650;text-decoration:underline;text-underline-offset:2px}
+    .mic-btn,.mic-btn:focus,.mic-btn:focus-visible{border:0!important;outline:none!important;box-shadow:0 6px 14px rgba(0,0,0,.22)!important}
+    /* Unified, softer motion for dialogs, overlays, notices and message menus. */
+    .auth-layer.open,.modal-back.open,.video-record-overlay.open,.video-playback-overlay.open{animation:popupBackdropIn .34s cubic-bezier(.22,.72,.24,1) both}
+    .auth-layer.closing,.modal-back.closing,.video-record-overlay.closing,.video-playback-overlay.closing{animation:popupBackdropOut .22s cubic-bezier(.4,0,.7,.35) both;pointer-events:none}
+    .auth-layer.open .auth-card,.modal-back.open .modal,.modal-back.open .avatar-crop-dialog,.video-record-overlay.open .video-record-content{animation:popupContentIn .38s cubic-bezier(.2,.78,.25,1) both;transform-origin:center}
+    .auth-layer.closing .auth-card,.modal-back.closing .modal,.video-record-overlay.closing .video-record-content{animation:popupContentOut .2s cubic-bezier(.4,0,.7,.35) both}
+    .video-playback-overlay.open .video-playback-circle{animation:playbackExpand .56s cubic-bezier(.16,.72,.2,1) both}
+    .video-playback-overlay.closing .video-playback-circle{animation:popupContentOut .2s cubic-bezier(.4,0,.7,.35) both}
+    .auth-notice{display:block;visibility:hidden;opacity:0;transform:translateY(-4px) scale(.99);max-height:0;overflow:hidden;margin-top:0;padding-top:0;padding-bottom:0;transition:opacity .22s cubic-bezier(.22,.72,.24,1),transform .26s cubic-bezier(.2,.78,.25,1),max-height .26s ease,margin .26s ease,padding .26s ease,visibility 0s linear .26s}
+    .auth-notice.show{visibility:visible;opacity:1;transform:translateY(0) scale(1);max-height:180px;margin-top:13px;padding:13px 15px;transition-delay:0s}
+    .auth-notice.show{animation:popupNoticeIn .28s cubic-bezier(.2,.78,.25,1) both}
+    .toast{transition:opacity .32s cubic-bezier(.22,.72,.24,1),transform .38s cubic-bezier(.2,.78,.25,1),filter .32s cubic-bezier(.22,.72,.24,1);filter:blur(3px) scale(.98)}
+    .toast.show{filter:blur(0) scale(1)}
+    .msg-action-list{display:grid;visibility:hidden;opacity:0;transform:translateY(-5px) scale(.97);transform-origin:top right;transition:opacity .2s cubic-bezier(.22,.72,.24,1),transform .24s cubic-bezier(.2,.78,.25,1),visibility 0s linear .24s;pointer-events:none}
+    .msg-actions.open .msg-action-list{visibility:visible;opacity:1;transform:translateY(0) scale(1);transition:opacity .2s cubic-bezier(.22,.72,.24,1),transform .24s cubic-bezier(.2,.78,.25,1),visibility 0s;pointer-events:auto;gap:3px}
+    @keyframes popupBackdropIn{from{opacity:0}to{opacity:1}}
+    @keyframes popupBackdropOut{from{opacity:1}to{opacity:0}}
+    @keyframes popupContentIn{from{opacity:0;transform:translateY(12px) scale(.965);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+    @keyframes popupContentOut{from{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}to{opacity:0;transform:translateY(7px) scale(.98);filter:blur(3px)}}
+    @keyframes popupNoticeIn{from{opacity:0;transform:translateY(-5px) scale(.985);filter:blur(3px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+  .language-select{min-width:112px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);color:var(--ink);font:inherit;outline:none}
   </style>
 </head>
 <body>
   <main class="shell">
     <aside class="rail">
-      <div class="rail-profile" aria-label="Профиль"><div class="avatar a2" id="railAvatar">А</div><span class="rail-profile-text"><strong id="railName">Александр</strong><small id="railRole">Владелец семьи</small></span></div>
+      <div class="rail-profile" aria-label="Профиль"><div class="avatar a2" id="railAvatar">А</div><span class="rail-profile-text"><strong id="railName">Александр</strong><small id="railRole">Владелец</small></span></div>
       <nav class="nav" aria-label="Разделы">
         <button class="active" data-page="chats"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5h14a2.5 2.5 0 0 1 2.5 2.5v7a2.5 2.5 0 0 1-2.5 2.5h-6.5L7 21v-3.5H5A2.5 2.5 0 0 1 2.5 15V8A2.5 2.5 0 0 1 5 5.5Z"/></svg></span><span class="nav-label">Чаты</span><span class="nav-count">3</span></button>
         <button data-page="contacts"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5 9.4 3a1.7 1.7 0 0 1 1.9 1l1.2 2.8a1.8 1.8 0 0 1-.4 2l-1.5 1.5a14.5 14.5 0 0 0 3.2 3.2l1.5-1.5a1.8 1.8 0 0 1 2-.4l2.8 1.2a1.7 1.7 0 0 1 1 1.9l-.5 2.8a2 2 0 0 1-2 1.6A16.6 16.6 0 0 1 4.9 5.5a2 2 0 0 1 1.7-2Z"/></svg></span><span class="nav-label">Контакты</span></button>
@@ -85,24 +175,25 @@
     </aside>
     <section class="list" id="chatListPanel">
       <div class="list-head"><label class="search"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 4.2 4.2"/></svg><input id="searchChats" placeholder="Поиск" /></label><div class="segmented"><button class="selected" data-filter="all">Все</button><button data-filter="personal">Личные</button><button data-filter="groups">Группы</button></div></div>
-      <div class="chat-list" id="chatList"></div><div class="list-footer">FAM - всё для семьи</div>
+      <div class="chat-list" id="chatList"></div>
     </section>
     <section class="conversation" id="conversation">
-      <header class="conv-head"><button class="round-btn back-chat-btn" id="backChats" aria-label="Назад"><svg class="back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><button class="avatar-link header-avatar-link" id="convAvatarLink" aria-label="Открыть профиль собеседника"><div class="avatar a1" id="convAvatar">С</div></button><div class="conv-heading"><div class="conv-title" id="convTitle">Семья</div><div class="conv-status" id="convStatus"></div></div><div class="head-actions"><button class="round-btn" title="Профиль собеседника" id="chatInfo">ⓘ</button></div></header>
+      <header class="conv-head"><button class="round-btn back-chat-btn" id="backChats" aria-label="Назад"><svg class="back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><button class="avatar-link header-avatar-link" id="convAvatarLink" aria-label="Открыть профиль собеседника"><div class="avatar a1" id="convAvatar">С</div></button><div class="conv-heading"><div class="conv-title" id="convTitle">Семья</div><div class="conv-status" id="convStatus"></div></div><div class="head-actions"><button class="round-btn" type="button" title="Поиск по сообщениям" id="chatSearchBtn" aria-label="Искать сообщения"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 4.2 4.2"/></svg></button></div></header>
+      <div class="chat-search-panel" id="chatSearchPanel" hidden><label class="search"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 4.2 4.2"/></svg><input id="chatMessageSearch" placeholder="Поиск в переписке" autocomplete="off"></label><span class="chat-search-count" id="chatSearchCount" aria-live="polite"></span><button class="round-btn chat-search-nav" type="button" id="chatSearchPrev" aria-label="Предыдущее совпадение">↑</button><button class="round-btn chat-search-nav" type="button" id="chatSearchNext" aria-label="Следующее совпадение">↓</button><button class="round-btn chat-search-nav" type="button" id="chatSearchClose" aria-label="Закрыть поиск">×</button></div>
       <div class="pinned-message-banner" id="pinnedMessageBanner" hidden><button type="button" id="jumpToPinnedMessage" aria-label="Перейти к закреплённому сообщению"><span class="pin-banner-icon">📌</span><span class="pin-banner-copy"><strong>Закреплённое сообщение</strong><span id="pinnedMessageText"></span></span></button><button type="button" id="unpinMessage" aria-label="Открепить сообщение">×</button></div>
       <div class="messages" id="messages"></div>
       <div class="composer-wrap"><div class="reply-preview" id="replyPreview" hidden><div><strong id="replyAuthor"></strong><span id="replyText"></span></div><button type="button" id="cancelReply" aria-label="Отменить ответ">×</button></div><div class="recording-note" id="recordingNote">● <span id="recordingLabel">Запись голосового…</span> <span id="recordTimer">00:00</span> <button id="cancelRecording" style="background:none;color:inherit">Отмена</button></div><form class="composer" id="messageForm"><textarea id="messageInput" rows="1" placeholder="Сообщение…"></textarea><button class="mic-btn" type="button" id="micBtn" title="Переключить тип сообщения" aria-label="Переключить тип сообщения"><svg class="mic-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21m-4 0h8"/></svg></button><button class="send-btn is-hidden" id="sendBtn" type="submit" title="Отправить" aria-label="Отправить сообщение">↑</button></form></div>
     </section>
     <section class="page-panel" id="pagePanel"></section>
   </main>
-  <div class="video-playback-overlay" id="videoPlaybackOverlay" aria-hidden="true"><button class="playback-close" id="closeVideoPlayback" aria-label="Закрыть">×</button><div class="video-playback-circle"><video id="videoPlaybackMedia" playsinline controls></video><div class="video-note-play" id="videoPlaybackFallback">▶</div></div></div>
-  <div class="video-record-overlay" id="videoRecordOverlay" aria-hidden="true"><div class="video-record-content"><div class="record-circle"><video id="videoPreview" autoplay muted playsinline></video><svg class="video-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="3"/><path d="m16 10 5-3v10l-5-3z"/></svg><span class="record-live-dot"></span></div><div class="video-record-time" id="overlayRecordTimer">00:00</div><div class="video-record-actions"><button type="button" class="record-cancel" id="videoRecordCancel" aria-label="Отменить запись">Отмена</button><button type="button" class="record-send" id="videoRecordSend" aria-label="Отправить видеосообщение">Отправить</button></div></div></div>
+  <div class="video-playback-overlay" id="videoPlaybackOverlay" aria-hidden="true"><button class="playback-close" id="closeVideoPlayback" aria-label="Закрыть">×</button><div class="video-playback-circle"><video id="videoPlaybackMedia" playsinline aria-label="Видеосообщение"></video><div class="video-note-play" id="videoPlaybackFallback">▶</div></div></div>
+  <div class="video-record-overlay" id="videoRecordOverlay" aria-hidden="true"><div class="video-record-content"><div class="record-circle"><video id="videoPreview" autoplay muted playsinline></video><button type="button" class="record-camera-switch" id="toggleCameraBtn" title="Переключить камеру" aria-label="Переключить камеру"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.7 9a7 7 0 0 1 11.8-2L20 9M4 15l2.5 2a7 7 0 0 0 11.8-2"/></svg></button><svg class="video-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="3"/><path d="m16 10 5-3v10l-5-3z"/></svg><span class="record-live-dot"></span></div><div class="video-record-time" id="overlayRecordTimer">00:00</div><div class="video-record-limit">Максимум — 1 минута</div><div class="video-record-actions"><button type="button" class="record-cancel" id="videoRecordCancel" aria-label="Отменить запись">Отмена</button><button type="button" class="record-send" id="videoRecordSend" aria-label="Отправить видеосообщение">Отправить</button></div></div></div>
   <div class="auth-layer" id="authLayer"><div class="auth-card"><div class="auth-brand"><div class="auth-wordmark">FAM</div><div class="auth-tagline">made for family</div></div><div id="authContent"></div></div></div>
   <div class="modal-back" id="modalBack"><div class="modal" id="modalContent"></div></div>
   <div class="toast" id="toast"></div>
   <script>
   const seed={
-    user:{name:"Александр",login:"alex",role:"owner"},accounts:[{name:"Александр",login:"alex",role:"owner"},{name:"Мама",login:"mama",role:"member"},{name:"Мария",login:"maria",role:"member"},{name:"Папа",login:"papa",role:"member"},{name:"Лёша",login:"lesha",role:"member"},{name:"Бабушка",login:"baba",role:"member"}],theme:"light",activeChat:"family",filter:"all",
+    user:{name:"Александр",login:"alex",role:"owner"},accounts:[{name:"Александр",login:"alex",role:"owner"},{name:"Мама",login:"mama",role:"member"},{name:"Мария",login:"maria",role:"member"},{name:"Папа",login:"papa",role:"member"},{name:"Лёша",login:"lesha",role:"member"},{name:"Бабушка",login:"baba",role:"member"}],theme:"light",language:"ru",registrationOpen:true,activeChat:"family",filter:"all",
     chats:[
       {id:"family",name:"Семья Малигиных",kind:"group",avatar:"С",cls:"a4",time:"10:42",preview:"Мама: Купила всё к ужину 🥗",unread:2,online:"4 участника · 2 в сети",members:["Александр","Мама","Мария","Лёша","Бабушка","Папа"]},
       {id:"maria",name:"Мария",kind:"personal",avatar:"М",cls:"a3",time:"09:18",preview:"Голосовое · 0:12",unread:1,online:"в сети",members:["Александр","Мария"]},
@@ -119,34 +210,62 @@
     },contacts:[{name:"Мама",login:"mama",cls:"a1"},{name:"Мария",login:"maria",cls:"a3"},{name:"Папа",login:"papa",cls:"a2"},{name:"Лёша",login:"lesha",cls:"a4"},{name:"Бабушка",login:"baba",cls:""}],
   };
   let state;try{state=JSON.parse(localStorage.getItem("fam-proto"))||seed}catch{state=seed}
+  state.language=state.language==="en"?"en":"ru";
+  document.documentElement.lang=state.language;
+  if(typeof state.registrationOpen!=="boolean")state.registrationOpen=true;
   state.blockedUsers=Array.isArray(state.blockedUsers)?state.blockedUsers:[];state.contacts=state.contacts||seed.contacts;state.chats=state.chats||seed.chats;state.accounts=Array.isArray(state.accounts)?state.accounts:[];state.messages=state.messages||seed.messages;Object.values(state.messages).flat().forEach(message=>{if(message.mine&&typeof message.read!=="boolean")message.read=true});[state.user,...state.contacts.map(c=>({...c,role:c.role||"member"}))].forEach(account=>{if(!state.accounts.some(a=>String(a.login).toLowerCase()===String(account.login).toLowerCase()))state.accounts.push(account)});state.chats.forEach((c,i)=>{if(!Number.isFinite(c.updatedAt))c.updatedAt=Date.now()+state.chats.length-i;if(String(c.preview||"").startsWith("Видеосообщение"))c.preview="Видеосообщение"});
   function persist(){localStorage.setItem("fam-proto",JSON.stringify(state))}
   function escapeHTML(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
-  const weekdayShort=["вс","пн","вт","ср","чт","пт","сб"];
+  const uiTranslations=Object.fromEntries([
+    ["Чаты","Chats"],["Контакты","Contacts"],["Настройки","Settings"],["Разделы","Sections"],
+    ["Все","All"],["Личные","Personal"],["Группы","Groups"],["Поиск","Search"],["Поиск по юзернейму","Search by username"],["Поиск в переписке","Search in chat"],
+    ["Контакты","Contacts"],["＋ Новая группа","＋ New group"],["Новая группа","New group"],["＋ Добавить участников","＋ Add members"],["Добавить выбранных","Add selected"],["Создать группу","Create group"],["Отмена","Cancel"],["Например, Выходные","For example, Weekend"],["Название группы","Group name"],
+    ["Написать","Message"],["Профиль пользователя","User profile"],["Назад","Back"],["Заблокировать","Block"],["Разблокировать","Unblock"],["Пользователь заблокирован. Отправка сообщений недоступна.","This user is blocked. Messaging is unavailable."],["Пользователи с таким юзернеймом не найдены.","No users found with this username."],
+    ["Панель владельца","Owner panel"],
+    ["Панель владельца","Owner panel"],["Панель владельца","Owner panel"],["Управление пространством","Workspace management"],["Участники","Members"],["Участники группы","Group members"],["Администратор","Administrator"],["Владелец","Owner"],["Участник","Member"],["Регистрация","Registration"],["Регистрация FAM","FAM registration"],["Открыта","Open"],["Закрыта","Closed"],["Изменить доступность регистрации","Change registration availability"],
+    ["Новые участники могут создать аккаунт и сразу войти.","New members can create an account and sign in right away."],["Регистрация сейчас закрыта. Новые участники не могут создать аккаунт.","Registration is currently closed. New members cannot create an account."],["Юзернеймы должны быть уникальными и состоять из латинских букв и цифр.","Usernames must be unique and use Latin letters and numbers."],["Настройки семейного пространства","Family space settings"],["зарегистрированных аккаунтов","registered accounts"],["Зарегистрированных аккаунтов пока нет.","There are no registered accounts yet."],
+    ["Настройки аккаунта и приложения","Account and app settings"],["Внешний вид","Appearance"],["Тёмная тема","Dark mode"],["Язык интерфейса","Interface language"],["Русский","Russian"],["English","English"],["Имя","Name"],["Юзернейм","Username"],["Сохранить изменения","Save changes"],["Выйти из аккаунта","Sign out"],["Изменить фото","Change photo"],["＋ Добавить фото профиля","＋ Add profile photo"],["О прототипе","About this prototype"],
+    ["FAM — прототип. Аккаунты и сообщения существуют только в этом браузере; пароль проверяется локально и не защищён сервером. Серверная база, защищённая авторизация, синхронизация между устройствами и реальная доставка сообщений не подключены.","FAM is a prototype. Accounts and messages exist only in this browser; passwords are checked locally and are not protected by a server. There is no server database, secure authentication, cross-device sync, or real message delivery."],
+    ["Пока нет сообщений. Напишите первым.","No messages yet. Send the first one."],["Создайте новый чат или группу, чтобы начать общение.","Create a new chat or group to get started."],["Чатов пока нет. Создайте новый чат или группу в разделе «Контакты».","There are no chats yet. Create a chat or group in Contacts."],["В этой категории пока нет чатов.","There are no chats in this category yet."],["По запросу ничего не найдено.","No results found."],["Закрепить","Pin"],["Открепить","Unpin"],["Удалить","Delete"],["Переслать","Forward"],["Изменить","Edit"],["Закреплён","Pinned"],["Закреплённое сообщение","Pinned message"],["Перейти к закреплённому сообщению","Go to pinned message"],["Действия с сообщением","Message actions"],["Поиск по сообщениям","Search messages"],["Искать сообщения","Search messages"],["Предыдущее совпадение","Previous match"],["Следующее совпадение","Next match"],["Закрыть поиск","Close search"],["Отменить ответ","Cancel reply"],["Отменить запись","Cancel recording"],["Отправить видеосообщение","Send video message"],["Переключить камеру","Switch camera"],["Максимум — 1 минута","Maximum: 1 minute"],["Отправить","Send"],["Отправить сообщение","Send message"],["Переключить тип сообщения","Switch message type"],["Сообщение…","Message…"],["Пользователь заблокирован","User blocked"],["Видеосообщение","Video message"],["Голосовое сообщение","Voice message"],["Демо-кружок без видеозаписи","Demo video message (no recording)"],["Демо-аудио без записи","Demo audio (not recorded)"],["Сегодня","Today"],["Сейчас","Now"],["сейчас","now"],["в сети","online"],["был недавно","last seen recently"],["владелец","owner"],["участник","member"],[" · вы"," · you"],["Переслано от","Forwarded from"],["Реакция: сердце","Reaction: heart"],["Прочитано","Read"],["Отправлено","Sent"],
+    ["ВХОД","SIGN IN"],["Создайте аккаунт FAM. После регистрации вы сразу войдёте.","Create your FAM account. You will be signed in right after registration."],["Ваше имя","Your name"],["Например, Мария","For example, Maria"],["Ваш юзернейм","Your username"],["Пароль","Password"],["Не менее 8 символов","At least 8 characters"],["Подтвердите пароль","Confirm password"],["Повторите пароль","Enter your password again"],["Зарегистрироваться","Sign up"],["Войти","Sign in"],["Уже есть аккаунт? Войти","Already have an account? Sign in"],["Нет аккаунта? Зарегистрироваться","No account? Sign up"],["Продолжить как демонстрационный владелец","Continue as demo owner"],["Регистрация закрыта владельцем.","Registration is closed by the owner."],
+    ["Введите ваше имя.","Enter your name."],["Юзернейм может содержать только латинские буквы и цифры.","Usernames can contain only Latin letters and numbers."],["Пароль должен содержать минимум 8 символов.","Password must be at least 8 characters."],["В пароле разрешены латинские буквы, цифры и символы ! . _ - , + = ?.","Passwords may use Latin letters, numbers, and these symbols: ! . _ - , + = ?."],["Пароли не совпадают.","Passwords do not match."],["Браузер не поддерживает локальную проверку пароля.","This browser does not support local password verification."],["Этот юзернейм уже занят. Выберите другой.","This username is already taken. Choose another."],["Этот юзернейм уже занят","This username is already taken"],["Аккаунт не найден. Зарегистрируйтесь, чтобы войти.","Account not found. Sign up to continue."],["Аккаунт не найден. Регистрация закрыта.","Account not found. Registration is closed."],["Для демо-аккаунта используйте кнопку демонстрационного входа.","For the demo account, use the demo sign-in button."],["Неверный пароль.","Incorrect password."],["Аккаунт создан. Добро пожаловать в FAM!","Account created. Welcome to FAM!"],["Вы вошли в FAM","You are signed in to FAM"],["Демо-вход: Александр","Demo sign-in: Александр"],
+    ["Фото профиля","Profile photo"],["Кадрировать фото","Crop photo"],["Перетащите изображение и настройте масштаб. Аватар будет круглым.","Drag the image and adjust the zoom. The avatar will be circular."],["Масштаб","Zoom"],["Сохранить фото","Save photo"],["Фото профиля обновлено","Profile photo updated"],["Не удалось обработать это изображение","Could not process this image"],["Выберите файл изображения","Choose an image file"],["Не удалось открыть это изображение","Could not open this image"],
+    ["Ничего не найдено.","Nothing found."],["Введите юзернейм для поиска участника.","Enter a username to find a member."],["Ничего не найдено по этому юзернейму.","No results for this username."],["Введите название группы","Enter a group name"],["Добавьте хотя бы одного участника","Add at least one member"],["Группа создана","Group created"],["Участники добавлены","Members added"],["Выберите людей для добавления","Select people to add"],["Пользователь заблокирован","User is blocked"],["Профиль обновлён","Profile updated"],["Панель доступна только владельцу","Only the owner can access this panel"],["Регистрация открыта","Registration is open"],["Регистрация закрыта","Registration is closed"],["Нет других чатов для пересылки","There are no other chats to forward to"],["Чат закреплён","Chat pinned"],["Чат откреплён","Chat unpinned"],["Демо-вход: Александр","Demo sign-in: Александр"],["Профиль: ","Profile: "],["Открыть профиль","Open profile"],["Воспроизвести видеосообщение","Play video message"],["Голосовое сообщение","Voice message"],["Фото с дачи отправил","Sent a photo from the dacha"]
+  ]);
+  const uiTranslationsReverse=Object.fromEntries(Object.entries(uiTranslations).map(([ru,en])=>[en,ru]));
+  function localizeUiString(value){const text=String(value??"");const dictionary=state.language==="en"?uiTranslations:uiTranslationsReverse;let result=dictionary[text]??text;if(result!==text)return result;if(state.language==="en"){result=result.replace(/^(\d+) участник(?:а|ов)?$/,"$1 members").replace(/^(\d+) участника · (\d+) в сети$/,"$1 members · $2 online").replace(/^Удалить (чат|группу) «(.+)»$/,(_,kind,name)=>`Delete ${kind==="группу"?"group":"chat"} “${name}”`).replace(/^(Закрепить|Открепить) чат «(.+)»$/,(_,action,name)=>`${action==="Закрепить"?"Pin":"Unpin"} chat “${name}”`).replace(/^Профиль: (.+)$/,"Profile: $1").replace(/^Открыть профиль (.+)$/,"Open profile $1")}else{result=result.replace(/^(\d+) members$/,"$1 участников").replace(/^(\d+) members · (\d+) online$/,"$1 участника · $2 в сети").replace(/^Delete (group|chat) “(.+)”$/,(_,kind,name)=>`Удалить ${kind==="group"?"группу":"чат"} «${name}»`).replace(/^(Pin|Unpin) chat “(.+)”$/,(_,action,name)=>`${action==="Pin"?"Закрепить":"Открепить"} чат «${name}»`).replace(/^Profile: (.+)$/,"Профиль: $1").replace(/^Open profile (.+)$/,"Открыть профиль $1")}return result}
+  function shouldSkipTranslation(node){const parent=node.parentElement;if(!parent)return true;return Boolean(parent.closest("script,style,textarea,input,select,option,.message-text,.msg-author,.reply-quote,.chat-name,.chat-preview,.avatar,.user-profile-name,.profile-user-name,.directory-user-meta,.group-member-meta,.contact-sub,.contact-person,[data-user],#railName,#convTitle,#convAvatar,#railAvatar,#pinnedMessageText,#replyAuthor,#replyText"))}
+  function translateDom(root=document.body){if(!root)return;const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let textNode;while((textNode=walker.nextNode())){if(shouldSkipTranslation(textNode))continue;const value=textNode.nodeValue,match=value.match(/^(\s*)([\s\S]*?)(\s*)$/);if(!match)continue;const translated=localizeUiString(match[2]);if(translated!==match[2])textNode.nodeValue=match[1]+translated+match[3]}const elements=root.nodeType===Node.ELEMENT_NODE?[root,...root.querySelectorAll("*")]:[];for(const element of elements){if(element.matches(".message-text,.msg-author,.reply-quote,.chat-name,.chat-preview,.avatar,.user-profile-name,.directory-user-meta,.group-member-meta,.contact-sub,.contact-person,[data-user],#railName,#convTitle,#convAvatar,#railAvatar,#pinnedMessageText,#replyAuthor,#replyText"))continue;for(const attribute of ["placeholder","title","aria-label","alt"]){if(element.hasAttribute(attribute)){const value=element.getAttribute(attribute),translated=localizeUiString(value);if(translated!==value)element.setAttribute(attribute,translated)}}}}
+  const uiTranslationObserver=new MutationObserver(records=>{for(const record of records){if(record.type==="characterData")translateDom(record.target.parentElement);else record.addedNodes.forEach(node=>{if(node.nodeType===Node.ELEMENT_NODE||node.nodeType===Node.TEXT_NODE)translateDom(node.nodeType===Node.TEXT_NODE?node.parentElement:node)})}});
+  uiTranslationObserver.observe(document.body,{subtree:true,childList:true,characterData:true});
+  const weekdayShort=["вс","пн","вт","ср","чт","пт","сб"],weekdayShortEn=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   function localDayStart(value){const date=new Date(value);return new Date(date.getFullYear(),date.getMonth(),date.getDate()).getTime()}
   function dayDistance(value){const date=new Date(value),today=new Date();const dayNumber=item=>Date.UTC(item.getFullYear(),item.getMonth(),item.getDate())/86400000;return Math.max(0,dayNumber(today)-dayNumber(date))}
-  function formatMessageTime(value){return new Intl.DateTimeFormat("ru-RU",{hour:"2-digit",minute:"2-digit"}).format(new Date(value))}
-  function formatChatTime(value){if(!value)return "сейчас";const date=new Date(value),days=dayDistance(date);if(days===0)return "сейчас";if(days<=7)return weekdayShort[date.getDay()];return new Intl.DateTimeFormat("ru-RU",{day:"numeric",month:"short"}).format(date).replace(" г.","")}
-  function formatMessageDay(value){const date=new Date(value),days=dayDistance(date);if(days===0)return "Сегодня";if(days<=7)return weekdayShort[date.getDay()];return new Intl.DateTimeFormat("ru-RU",{day:"numeric",month:"long",year:date.getFullYear()===new Date().getFullYear()?undefined:"numeric"}).format(date)}
+  function formatMessageTime(value){return new Intl.DateTimeFormat(state.language==="en"?"en-GB":"ru-RU",{hour:"2-digit",minute:"2-digit"}).format(new Date(value))}
+  function formatChatTime(value){if(!value)return state.language==="en"?"now":"сейчас";const date=new Date(value),days=dayDistance(date);if(days===0)return state.language==="en"?"now":"сейчас";if(days<=7)return (state.language==="en"?weekdayShortEn:weekdayShort)[date.getDay()];return new Intl.DateTimeFormat(state.language==="en"?"en-GB":"ru-RU",{day:"numeric",month:"short"}).format(date).replace(" г.","")}
+  function formatMessageDay(value){const date=new Date(value),days=dayDistance(date);if(days===0)return state.language==="en"?"Today":"Сегодня";return new Intl.DateTimeFormat(state.language==="en"?"en-GB":"ru-RU",{day:"numeric",month:"long",year:date.getFullYear()===new Date().getFullYear()?undefined:"numeric"}).format(date)}
   function legacyMessageTimestamp(value,index=0){const now=new Date(),label=String(value||"").trim().toLowerCase(),clock=label.match(/^(\d{1,2}):(\d{2})$/);if(clock){const date=new Date(now);date.setHours(Number(clock[1]),Number(clock[2]),0,0);return date.getTime()}if(label==="сейчас")return Date.now()-index*1000;const date=new Date(now);date.setHours(12,0,0,0);if(label==="вчера"){date.setDate(date.getDate()-1);return date.getTime()}const dayIndex=weekdayShort.indexOf(label);if(dayIndex>=0){let offset=(date.getDay()-dayIndex+7)%7;if(offset===0)offset=7;date.setDate(date.getDate()-offset);return date.getTime()}return Date.now()-index*60000}
-  function migrateLegacyTimestamps(){state.chats.forEach(chat=>{const messages=state.messages[chat.id]||[];messages.forEach((message,index)=>{if(!Number.isFinite(Number(message.createdAt)))message.createdAt=legacyMessageTimestamp(message.time,index)});if(messages.length)chat.updatedAt=Math.max(...messages.map(message=>Number(message.createdAt)||0))})}
+  function migrateLegacyTimestamps(){state.chats.forEach(chat=>{const messages=state.messages[chat.id]||[];messages.forEach((message,index)=>{if(!Number.isFinite(Number(message.createdAt)))message.createdAt=legacyMessageTimestamp(message.time,index)});messages.sort((a,b)=>(Number(a.createdAt)||0)-(Number(b.createdAt)||0));if(messages.length)chat.updatedAt=Math.max(...messages.map(message=>Number(message.createdAt)||0))})}
   function latestChatActivity(chat){const messages=state.messages[chat.id]||[];return messages.reduce((latest,message)=>Math.max(latest,Number(message.createdAt)||0),0)||Number(chat.updatedAt)||0}
   const byId=id=>document.getElementById(id), current=()=>state.chats.find(c=>c.id===state.activeChat)||state.chats[0]||null;
-  let chatOpen=window.matchMedia("(min-width:701px)").matches,viewedUser=null,lastMessageTap={id:null,time:0},replyToId=null,gestureState=null,longPressTimer=null,selectedGroupUsers=new Set(),selectedAddUsers=new Set(),suppressChatRowClickUntil=0,chatExitTimer=null;
-  function toast(s){const t=byId("toast");t.textContent=s;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2400)}
+  let chatOpen=window.matchMedia("(min-width:701px)").matches,activePage="chats",viewedUser=null,viewedUserReturnPage="chats",lastMessageTap={id:null,time:0},replyToId=null,gestureState=null,longPressTimer=null,selectedGroupUsers=new Set(),selectedAddUsers=new Set(),suppressChatRowClickUntil=0,chatExitTimer=null;
+  const popupClosures=new WeakMap();let toastTimer=null;
+  function openPopup(element){if(!element)return;const pending=popupClosures.get(element);if(pending){clearTimeout(pending.timer);element.removeEventListener("animationend",pending.onEnd);popupClosures.delete(element)}element.classList.remove("closing");element.classList.add("open")}
+  function closePopup(element,after){if(!element){after?.();return}const pending=popupClosures.get(element);if(pending){clearTimeout(pending.timer);element.removeEventListener("animationend",pending.onEnd)}if(!element.classList.contains("open")){element.classList.remove("closing");after?.();return}let done=false;const finish=()=>{if(done)return;done=true;clearTimeout(timer);element.removeEventListener("animationend",onEnd);element.classList.remove("open","closing");popupClosures.delete(element);after?.()};const onEnd=event=>{if(event.target===element)finish()};const timer=setTimeout(finish,280);popupClosures.set(element,{timer,onEnd});element.addEventListener("animationend",onEnd);element.classList.add("closing")}
+  function toast(s){const t=byId("toast");clearTimeout(toastTimer);t.textContent=localizeUiString(s);t.classList.add("show");toastTimer=setTimeout(()=>t.classList.remove("show"),2400)}
   function avatar(letter,cls=""){return `<div class="avatar ${cls}">${escapeHTML(letter)}</div>`}
   function userAvatar(cls=""){return `<div class="avatar ${cls}">${state.user.photo?`<img src="${escapeHTML(state.user.photo)}" alt="Фото профиля">`:escapeHTML(state.user.name[0]||"?")}</div>`}
   function normalizeUsername(value){return String(value||"").trim().replace(/^@/,"").replace(/\s+/g,"").toLowerCase()}
   function validUsername(value){return /^[A-Za-z0-9]+$/.test(String(value||"").trim())}
   function usernameTaken(value,allowCurrent=false){const username=normalizeUsername(value),self=normalizeUsername(state.user.login);if(!username)return false;return state.accounts.some(a=>normalizeUsername(a.login)===username&&!(allowCurrent&&username===self))||state.contacts.some(c=>normalizeUsername(c.login)===username&&!(allowCurrent&&username===self&&c.name===state.user.name))}
   function isBlocked(name){const person=state.contacts.find(x=>x.name===name);return state.blockedUsers.includes(normalizeUsername(person?.login||name))}
-  function contactRows(query=""){const q=normalizeUsername(query);return state.contacts.filter(c=>!q||normalizeUsername(c.login).includes(q)).map(c=>`<div class="contact-row"><button class="contact-person" data-user="${escapeHTML(c.name)}">${avatar(c.name[0],c.cls)}<span class="contact-meta"><span class="contact-name">${escapeHTML(c.name)}</span><span class="contact-sub">@${escapeHTML(c.login)}${isPersonOnline(c.name)?" · в сети":""}</span></span></button><button class="secondary-btn" data-contact="${escapeHTML(c.name)}">Написать</button></div>`).join("")||`<p class="page-sub">Пользователи с таким юзернеймом не найдены.</p>`}
+  function contactRows(query=""){const q=normalizeUsername(query);return state.contacts.filter(c=>!q||normalizeUsername(c.login).includes(q)).map(c=>`<div class="contact-row"><button class="contact-person" data-user="${escapeHTML(c.name)}">${avatar(c.name[0],c.cls)}<span class="contact-meta"><span class="contact-name">${escapeHTML(c.name)}</span><span class="contact-sub">@${escapeHTML(c.login)}${isPersonOnline(c.name)?` · ${state.language==="en"?"online":"в сети"}`:""}</span></span></button><button class="secondary-btn" data-contact="${escapeHTML(c.name)}">Написать</button></div>`).join("")||`<p class="page-sub">Пользователи с таким юзернеймом не найдены.</p>`}
   function bindContactButtons(root=document){root.querySelectorAll("[data-contact]").forEach(b=>b.onclick=()=>openContactChat(b.dataset.contact))}
   function drawPersonPicker(query,resultsId,selectedId,selection,excludedNames,mode){const results=byId(resultsId),selectedHost=byId(selectedId);if(!results||!selectedHost)return;const q=normalizeUsername(query),excluded=new Set(excludedNames||[]),matches=q?state.contacts.filter(person=>person.name!==state.user.name&&!excluded.has(person.name)&&!selection.has(person.login)&&normalizeUsername(person.login).includes(q)):[];results.innerHTML=q?(matches.length?matches.slice(0,8).map(person=>`<button type="button" class="group-search-result" data-pick-login="${escapeHTML(person.login)}" data-pick-mode="${mode}">${avatar(person.name[0],person.cls)}<span>${escapeHTML(person.name)}</span><small>@${escapeHTML(person.login)}</small></button>`).join(""):`<div class="group-search-empty">Ничего не найдено по этому юзернейму.</div>`):`<div class="group-search-empty">Введите юзернейм для поиска участника.</div>`;selectedHost.innerHTML=[...selection].map(login=>{const person=state.contacts.find(item=>item.login===login);return person?`<span class="member-chip">${escapeHTML(person.name)} @${escapeHTML(person.login)}<button type="button" aria-label="Убрать ${escapeHTML(person.name)}" data-remove-login="${escapeHTML(person.login)}" data-pick-mode="${mode}">×</button></span>`:""}).join("")}
   function refreshPersonPickers(){const activeChat=current();drawPersonPicker(byId("groupMemberSearch")?.value||"","groupMemberResults","groupSelectedMembers",selectedGroupUsers,[],"create");drawPersonPicker(byId("addMemberSearch")?.value||"","addMemberResults","addSelectedMembers",selectedAddUsers,activeChat?.members||[],"add")}
   function usernameFor(name){const person=state.contacts.find(x=>x.name===name);return person?.login||(name===state.user.name?state.user.login:name.toLowerCase().replace(/\s/g,""))}
   function openContactChat(name){let c=state.chats.find(x=>x.name===name&&x.kind==="personal");if(!c){const id="chat"+Date.now(),person=state.contacts.find(x=>x.name===name)||{};c={id,name,kind:"personal",avatar:name[0],cls:person.cls||"a3",time:"сейчас",preview:"Новый чат",unread:0,members:[state.user.name,name],updatedAt:Date.now()};state.chats.unshift(c);state.messages[id]=[]}selectChat(c.id)}
-  function refreshSidebarProfile(){const el=byId("railAvatar");if(el)el.innerHTML=state.user.photo?`<img src="${escapeHTML(state.user.photo)}" alt="Фото профиля">`:escapeHTML(state.user.name[0]||"?");if(byId("railName"))byId("railName").textContent=state.user.name;if(byId("railRole"))byId("railRole").textContent=state.user.role==="owner"?"Владелец семьи":"Участник семьи"}
+  function refreshSidebarProfile(){const el=byId("railAvatar");if(el)el.innerHTML=state.user.photo?`<img src="${escapeHTML(state.user.photo)}" alt="Фото профиля">`:escapeHTML(state.user.name[0]||"?");if(byId("railName"))byId("railName").textContent=state.user.name;if(byId("railRole"))byId("railRole").textContent=state.user.role==="owner"?(state.language==="en"?"Owner":"Владелец"):(state.language==="en"?"Member":"Участник")}
   function nav(page){
     const conversation=byId("conversation");
     if(chatExitTimer){clearTimeout(chatExitTimer);chatExitTimer=null;conversation.classList.remove("closing")}
@@ -154,8 +273,9 @@
       if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){conversation.classList.add("closing");chatExitTimer=setTimeout(()=>{chatExitTimer=null;conversation.classList.remove("closing");chatOpen=false;nav(page)},230);return}
       chatOpen=false;
     }
-    if(page==="owner"&&state.user.role!=="owner"){toast("Панель доступна только владельцу семьи");page="profile"}
-    document.querySelectorAll(".nav button").forEach(button=>button.classList.toggle("active",button.dataset.page===(page==="owner"?"profile":(page==="userProfile"||page==="groupMembers")?"chats":page)));
+    if((page==="owner"||page==="ownerMembers")&&state.user.role!=="owner"){toast("Панель доступна только владельцу");page="profile"}
+    activePage=page;
+    document.querySelectorAll(".nav button").forEach(button=>button.classList.toggle("active",button.dataset.page===((page==="owner"||page==="ownerMembers")?"profile":(page==="userProfile"||page==="groupMembers")?"chats":page)));
     const list=byId("chatListPanel"),panel=byId("pagePanel"),chatPage=page==="chats",showConversation=chatPage&&chatOpen,mobileChat=showConversation&&window.matchMedia("(max-width:700px)").matches;
     document.querySelector(".rail").classList.toggle("chat-mode",mobileChat);
     document.querySelector(".shell").classList.toggle("chat-open",showConversation);
@@ -187,7 +307,7 @@
           ${avatar(chat.avatar,chat.cls)}
           <span class="chat-info">
             <span class="chat-topline"><span class="chat-title-line">${chat.pinned?`<span class="chat-pin-mark" aria-label="Закреплён">📌</span>`:""}<span class="chat-name">${escapeHTML(chat.name)}</span></span><span class="chat-time">${formatChatTime(latestChatActivity(chat))}</span></span>
-            <span class="chat-preview">${escapeHTML(chat.preview)}</span>
+            <span class="chat-preview">${escapeHTML(localizedChatPreview(chat.preview))}</span>
           </span>
           ${chat.unread?`<span class="unread">${chat.unread}</span>`:""}
         </button>
@@ -204,6 +324,7 @@
 
     host.querySelectorAll("[data-chat]").forEach(button=>{
       let startX=0,startY=0,offset=0,tracking=false;
+      const wrap=button.closest(".chat-row-wrap");
       button.addEventListener("pointerdown",event=>{
         if(event.button!==undefined&&event.button!==0)return;
         startX=event.clientX;startY=event.clientY;offset=button.closest(".chat-row-wrap").classList.contains("revealed")?-132:0;tracking=true;
@@ -213,19 +334,29 @@
         if(!tracking)return;
         const dx=event.clientX-startX,dy=event.clientY-startY;
         if(Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>10){tracking=false;button.classList.remove("swiping");button.style.removeProperty("transform");return}
-        if(Math.abs(dx)>8){button.classList.add("swiping");button.style.transform=`translateX(${Math.max(-132,Math.min(0,offset+dx))}px)`}
+        if(Math.abs(dx)>5){button.classList.add("swiping");button.style.transform=`translateX(${Math.max(-132,Math.min(0,offset+dx))}px)`}
       });
       const finishSwipe=event=>{
         if(!tracking)return;
         tracking=false;
-        const dx=event.clientX-startX,wrap=button.closest(".chat-row-wrap"),wasOpen=wrap.classList.contains("revealed");
+        const dx=event.clientX-startX,wasOpen=wrap.classList.contains("revealed");
         button.classList.remove("swiping");button.style.removeProperty("transform");
-        if(dx<-42)wrap.classList.add("revealed");
-        else if(dx>38&&wasOpen)wrap.classList.remove("revealed");
-        if(Math.abs(dx)>24)suppressChatRowClickUntil=performance.now()+350;
+        if(dx<-24)wrap.classList.add("revealed");
+        else if(dx>24&&wasOpen)wrap.classList.remove("revealed");
+        if(Math.abs(dx)>18)suppressChatRowClickUntil=performance.now()+350;
       };
       button.addEventListener("pointerup",finishSwipe);
       button.addEventListener("pointercancel",()=>{tracking=false;button.classList.remove("swiping");button.style.removeProperty("transform")});
+      let wheelDistance=0,wheelTimer=null;
+      wrap.addEventListener("wheel",event=>{
+        if(Math.abs(event.deltaX)<6||Math.abs(event.deltaX)<Math.abs(event.deltaY)*1.2)return;
+        event.preventDefault();wheelDistance+=event.deltaX;clearTimeout(wheelTimer);
+        wheelTimer=setTimeout(()=>{
+          if(wheelDistance<-14)wrap.classList.add("revealed");
+          else if(wheelDistance>14)wrap.classList.remove("revealed");
+          wheelDistance=0;
+        },90);
+      },{passive:false});
       button.onclick=()=>{
         if(performance.now()<suppressChatRowClickUntil)return;
         const wrap=button.closest(".chat-row-wrap");
@@ -259,10 +390,9 @@
       const finish=confirmed=>{
         if(settled)return;
         settled=true;
-        backdrop.classList.remove("open");
         backdrop.onclick=null;
         document.removeEventListener("keydown",onKeyDown);
-        resolve(confirmed);
+        closePopup(backdrop,()=>resolve(confirmed));
       };
       const onKeyDown=event=>{
         if(event.key==="Escape")finish(false);
@@ -278,7 +408,7 @@
       content.setAttribute("role","dialog");
       content.setAttribute("aria-modal","true");
       content.setAttribute("aria-labelledby","deleteChatTitle");
-      backdrop.classList.add("open");
+      openPopup(backdrop);
       backdrop.onclick=event=>{
         if(event.target===backdrop)finish(false);
       };
@@ -320,10 +450,28 @@
     toast(chat.kind==="group"?"Группа удалена":"Чат удалён");
   }
   function isPersonOnline(name){const person=state.contacts.find(x=>x.name===name);if(person&&typeof person.online==="boolean")return person.online;return name==="Мама"||name==="Мария"}
-  function openUserProfile(name){const person=state.contacts.find(x=>x.name===name)||{};viewedUser={name,login:person.login||(name===state.user.name?state.user.login:name.toLowerCase().replace(/\s/g,"")),cls:person.cls||(name===state.user.name?"a2":""),online:isPersonOnline(name)};nav("userProfile")}
+  function usernameForName(name){const person=state.contacts.find(x=>x.name===name)||state.accounts.find(x=>x.name===name)||(name===state.user.name?state.user:null);return normalizeUsername(person?.login||name.toLowerCase().replace(/[^a-z0-9]/g,""))||"user"}
+  function registeredAccounts(){const users=new Map();[...(state.accounts||[]),...(state.contacts||[]),state.user].filter(Boolean).forEach(account=>{const login=normalizeUsername(account.login);if(login)users.set(login,{...(users.get(login)||{}),...account,login})});return [...users.values()].sort((a,b)=>a.name.localeCompare(b.name,"ru"))}
+  function openUserProfile(name){const person=state.contacts.find(x=>x.name===name)||state.accounts.find(x=>x.name===name)||(name===state.user.name?state.user:null)||{};viewedUser={name,login:person.login||usernameForName(name),cls:person.cls||(name===state.user.name?"a2":""),online:isPersonOnline(name)};viewedUserReturnPage=byId("ownerMembersBack")?"ownerMembers":"chats";nav("userProfile");const back=byId("userProfileBack");if(back)back.onclick=()=>nav(viewedUserReturnPage)}
   function openChatProfile(){const c=current();if(!c)return;const name=c.kind==="group"?(c.members||[]).find(x=>x!==state.user.name)||c.name:c.name;openUserProfile(name)}
   function openChatInfo(){const c=current();if(!c)return;if(c.kind==="group")nav("groupMembers");else openChatProfile()}
-  function messageSummary(m){if(!m)return "Сообщение";return m.video?"Видеосообщение":m.voice?"Голосовое сообщение":m.text||"Сообщение"}
+  function messageSummary(m){if(!m)return state.language==="en"?"Message":"Сообщение";return m.video?(state.language==="en"?"Video message":"Видеосообщение"):m.voice?(state.language==="en"?"Voice message":"Голосовое сообщение"):m.text|| (state.language==="en"?"Message":"Сообщение")}
+  function localizedChatPreview(value){if(state.language!=="en")return value;return ({"Видеосообщение":"Video message","Голосовое сообщение":"Voice message","Голосовое · 0:12":"Voice message · 0:12","Группа создана":"Group created","Новый чат":"New chat"})[value]||value}
+  let messageSearchMatches=[],messageSearchIndex=-1;
+  function refreshMessageSearch(){
+    const panel=byId("chatSearchPanel"),input=byId("chatMessageSearch"),count=byId("chatSearchCount");if(!panel||!input||!count)return;
+    document.querySelectorAll(".msg-line.search-match").forEach(line=>line.classList.remove("search-match","search-current"));
+    const query=input.value.trim().toLocaleLowerCase("ru-RU");
+    if(panel.hidden||!query){messageSearchMatches=[];messageSearchIndex=-1;count.textContent="";return}
+    messageSearchMatches=(state.messages[state.activeChat]||[]).filter(message=>`${message.from||""} ${message.text||""} ${messageSummary(message)}`.toLocaleLowerCase("ru-RU").includes(query));
+    if(!messageSearchMatches.length){messageSearchIndex=-1;count.textContent="0 результатов";return}
+    if(messageSearchIndex<0||messageSearchIndex>=messageSearchMatches.length)messageSearchIndex=0;
+    messageSearchMatches.forEach((message,index)=>{const line=byId(`message-${message.id}`)?.closest(".msg-line");line?.classList.add("search-match");if(index===messageSearchIndex)line?.classList.add("search-current")});
+    count.textContent=`${messageSearchIndex+1} / ${messageSearchMatches.length}`;
+  }
+  function openMessageSearch(){const panel=byId("chatSearchPanel"),input=byId("chatMessageSearch");panel.hidden=false;input.value="";messageSearchIndex=-1;refreshMessageSearch();input.focus()}
+  function closeMessageSearch(){const panel=byId("chatSearchPanel"),input=byId("chatMessageSearch");if(!panel||!input)return;panel.hidden=true;input.value="";messageSearchIndex=-1;refreshMessageSearch()}
+  function stepMessageSearch(direction){if(!messageSearchMatches.length)return;messageSearchIndex=(messageSearchIndex+direction+messageSearchMatches.length)%messageSearchMatches.length;refreshMessageSearch();const message=messageSearchMatches[messageSearchIndex];byId(`message-${message.id}`)?.scrollIntoView({behavior:"smooth",block:"center"})}
   function setReply(id){const msg=(state.messages[state.activeChat]||[]).find(x=>x.id===id);if(!msg)return;replyToId=id;byId("replyAuthor").textContent=msg.from||"Вы";byId("replyText").textContent=messageSummary(msg);byId("replyPreview").hidden=false;byId("messageInput").focus()}
   function clearReply(){replyToId=null;if(byId("replyPreview"))byId("replyPreview").hidden=true}
   function waveform(){return `<div class="wave">${Array.from({length:27},(_,i)=>`<i style="--h:${6+((i*17+13)%17)}px"></i>`).join("")}</div>`}
@@ -397,10 +545,21 @@
     if(message.reaction&&!chip){chip=document.createElement("span");chip.className="reaction-chip";chip.setAttribute("aria-label","Реакция: сердце");chip.textContent="❤️";bubble?.append(chip)}else if(!message.reaction)chip?.remove();
     persist();
   }
+  function updateFloatingDay(){
+    const box=byId("messages"),pill=byId("floatingDay");if(!pill)return;
+    const lines=box.querySelectorAll(".msg-line");if(!lines.length){pill.hidden=true;return}
+    const threshold=box.getBoundingClientRect().top+48;let currentLine=lines[0];
+    for(const line of lines){if(line.getBoundingClientRect().top<=threshold)currentLine=line;else break}
+    const label=pill.querySelector("span"),nextLabel=currentLine.dataset.dayLabel||"Сегодня";
+    if(label.textContent!==nextLabel){pill.classList.remove("changed");label.textContent=nextLabel;void pill.offsetWidth;pill.classList.add("changed")}
+    pill.hidden=false;
+  }
+  let floatingDayRaf=0;
+  byId("messages").addEventListener("scroll",()=>{if(floatingDayRaf)return;floatingDayRaf=requestAnimationFrame(()=>{floatingDayRaf=0;updateFloatingDay()})},{passive:true});
   function renderMessages(keepPosition=false,animateLatest=false){
     const chat=current();
     const avatarButton=byId("convAvatarLink");
-    const chatInfoButton=byId("chatInfo");
+    const chatSearchButton=byId("chatSearchBtn");
     const messageInput=byId("messageInput");
     const micButton=byId("micBtn");
     const sendButton=byId("sendBtn");
@@ -411,7 +570,7 @@
       byId("convStatus").textContent="";
       byId("convAvatar").textContent="";
       avatarButton.disabled=true;
-      chatInfoButton.disabled=true;
+      chatSearchButton.disabled=true;
       byId("pinnedMessageBanner").hidden=true;
       messageBox.innerHTML=`<div class="chat-empty">Создайте новый чат или группу, чтобы начать общение.</div>`;
       messageInput.disabled=true;
@@ -420,60 +579,71 @@
       return;
     }
 
-    const status=chat.kind==="group"?chat.online:(isPersonOnline(chat.name)?"в сети":"");
+    const status=chat.kind==="group"?chat.online:(isPersonOnline(chat.name)?(state.language==="en"?"online":"в сети"):"");
     const blocked=chat.kind==="personal"&&isBlocked(chat.name);
-    const messages=state.messages[chat.id]||[];
+    const messages=[...(state.messages[chat.id]||[])].sort((a,b)=>(Number(a.createdAt)||0)-(Number(b.createdAt)||0));
     const previousScrollTop=messageBox.scrollTop;
 
-    chatInfoButton.disabled=false;
+    chatSearchButton.disabled=false;
     avatarButton.disabled=false;
     avatarButton.setAttribute("aria-label",`Профиль: ${chat.name}`);
     byId("convTitle").textContent=chat.name;
     byId("convAvatar").textContent=chat.avatar;
     byId("convAvatar").className=`avatar ${chat.cls||""}`;
     byId("convStatus").textContent=status;
-    chatInfoButton.title=chat.kind==="group"?"Участники группы":"Профиль собеседника";
+    chatSearchButton.title="Поиск по сообщениям";
     messageInput.disabled=blocked;
     micButton.disabled=blocked;
     sendButton.disabled=blocked;
     messageInput.placeholder=blocked?"Пользователь заблокирован":"Сообщение…";
 
-    let previousDay=null;
     const renderedMessages=messages.map(message=>{
       const timestamp=Number(message.createdAt)||Date.now();
-      const day=localDayStart(timestamp);
-      const dateDivider=day===previousDay?"":`<div class="day-divider">${formatMessageDay(timestamp)}</div>`;
-      previousDay=day;
+      const dayLabel=formatMessageDay(timestamp);
       const sender=message.from||"";
       const senderClass=sender==="Мария"?"a3":sender==="Мама"?"a1":sender==="Папа"?"a2":"";
       const senderAvatar=message.mine?"":`<button class="avatar-link message-avatar-link" data-user="${escapeHTML(sender)}" aria-label="Открыть профиль ${escapeHTML(sender)}">${avatar(sender[0]||"?",senderClass)}</button>`;
       const author=message.mine?"":`<div class="msg-author">${escapeHTML(sender)}</div>`;
+      const forwardName=message.forwardedFrom?.name||"",forwardUsername=normalizeUsername(message.forwardedFrom?.username||"");
+      const forwarded=forwardName&&forwardUsername?`<div class="forwarded-from"><span>Переслано от</span><button type="button" data-user="${escapeHTML(forwardName)}" aria-label="Открыть профиль @${escapeHTML(forwardUsername)}">@${escapeHTML(forwardUsername)}</button></div>`:"";
       const original=message.replyTo?messages.find(item=>item.id===message.replyTo):null;
       const reply=original?`<div class="reply-quote" data-reply-target="${original.id}"><b>${escapeHTML(original.from||"Вы")}</b><span>${escapeHTML(messageSummary(original))}</span></div>`:"";
       const content=message.video
         ?message.mediaId?`<button type="button" class="video-note" data-video-play="true" data-media-id="${escapeHTML(message.mediaId)}" aria-label="Воспроизвести видеосообщение">${message.poster?`<img class="video-note-poster" src="${escapeHTML(message.poster)}" alt="">`:""}<span class="video-note-play">▶</span></button>`:`<div class="video-note-unavailable" role="note">Демо-кружок без видеозаписи</div>`
         :message.voice
           ?message.mediaId?`<audio class="voice-player" data-media-id="${escapeHTML(message.mediaId)}" controls preload="metadata" aria-label="Голосовое сообщение"></audio>`:`<span class="media-unavailable" role="note">Демо-аудио без записи</span>`
-          :escapeHTML(message.text);
+          :`<span class="message-text">${escapeHTML(message.text)}</span>`;
       const pinned=String(chat.pinnedMessageId)===String(message.id);
-      const actions=`<div class="msg-actions"><button class="msg-more" type="button" data-message-actions aria-expanded="false" aria-label="Действия с сообщением">•••</button><div class="msg-action-list">${message.mine?`<button type="button" onclick="editMessage(${message.id})">Изменить</button>`:""}<button type="button" onclick="togglePinnedMessage(${message.id})">${pinned?"Открепить":"Закрепить"}</button><button type="button" onclick="deleteMessage(${message.id})">Удалить</button></div></div>`;
+      const actions=`<div class="msg-actions"><button class="msg-more" type="button" data-message-actions aria-expanded="false" aria-label="Действия с сообщением">•••</button><div class="msg-action-list">${message.mine?`<button type="button" onclick="editMessage(${message.id})">Изменить</button>`:""}<button type="button" data-forward-message="${message.id}">Переслать</button><button type="button" onclick="togglePinnedMessage(${message.id})">${pinned?"Открепить":"Закрепить"}</button><button type="button" onclick="deleteMessage(${message.id})">Удалить</button></div></div>`;
       const reaction=message.reaction?`<span class="reaction-chip" aria-label="Реакция: сердце">❤️</span>`:"";
       const receipt=message.mine?`<span class="msg-receipt ${message.read?"read":""}" aria-label="${message.read?"Прочитано":"Отправлено"}">${message.read?"✓✓":"✓"}</span>`:"";
 
-      return `${dateDivider}<div class="msg-line ${message.mine?"mine":""} ${pinned?"pinned":""}">${senderAvatar}<div class="bubble" id="message-${message.id}" data-message-id="${message.id}">${author}${reply}${content}${actions}${reaction}<div class="msg-meta">${formatMessageTime(timestamp)} ${receipt}</div></div></div>`;
+      return `<div class="msg-line ${message.mine?"mine":""} ${pinned?"pinned":""}" data-day-label="${escapeHTML(dayLabel)}">${senderAvatar}<div class="bubble" id="message-${message.id}" data-message-id="${message.id}">${forwarded}${author}${reply}${content}${actions}${reaction}<div class="msg-meta">${formatMessageTime(timestamp)} ${receipt}</div></div></div>`;
     }).join("");
 
     const pinnedMessage=messages.find(message=>String(message.id)===String(chat.pinnedMessageId));
     const pinnedBanner=byId("pinnedMessageBanner");
     pinnedBanner.hidden=!pinnedMessage;
     byId("pinnedMessageText").textContent=pinnedMessage?messageSummary(pinnedMessage):"";
-    messageBox.innerHTML=renderedMessages;
+    messageBox.innerHTML=messages.length?`<div class="floating-day" id="floatingDay" aria-hidden="true"><span>Сегодня</span></div>${renderedMessages}`:`<div class="chat-empty">Пока нет сообщений. Напишите первым.</div>`;
     if(animateLatest)messageBox.querySelector(".msg-line:last-of-type")?.classList.add("new-message");
-    messageBox.scrollTop=keepPosition?previousScrollTop:messageBox.scrollHeight;
+    if(keepPosition)messageBox.scrollTop=previousScrollTop;
+    else messageBox.scrollTo({top:messageBox.scrollHeight,behavior:animateLatest&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches?"smooth":"auto"});
+    updateFloatingDay();
     hydrateMediaElements(messageBox);
+    refreshMessageSearch();
   }
-  function selectChat(id){const chat=state.chats.find(item=>item.id===id);if(!chat)return;state.activeChat=chat.id;chatOpen=true;clearReply();chat.unread=0;persist();renderChats();renderMessages();nav("chats")}
-  document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>nav(b.dataset.page));document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>nav(b.dataset.go));document.querySelectorAll(".segmented button").forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;document.querySelectorAll(".segmented button").forEach(x=>x.classList.toggle("selected",x===b));renderChats()});byId("searchChats").oninput=renderChats;
+  function selectChat(id){const chat=state.chats.find(item=>item.id===id);if(!chat)return;closeMessageSearch();state.activeChat=chat.id;chatOpen=true;clearReply();chat.unread=0;persist();renderChats();renderMessages();nav("chats")}
+  function syncChatFilterTabs(){document.querySelectorAll(".segmented button").forEach(button=>button.classList.toggle("selected",button.dataset.filter===state.filter))}
+  function setChatFilter(filter){if(!["all","personal","groups"].includes(filter))return;state.filter=filter;syncChatFilterTabs();persist();renderChats();byId("chatList").querySelectorAll(".chat-row-wrap").forEach((row,index)=>{row.style.animationDelay=`${Math.min(index*16,112)}ms`;row.classList.add("filter-enter")})}
+  document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>nav(b.dataset.page));document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>nav(b.dataset.go));
+  const filterTabs=document.querySelector(".segmented"),filterSwipeSurface=byId("chatListPanel"),filterOrder=["all","personal","groups"];let folderSwipeStart=null,suppressFilterClickUntil=0;
+  document.querySelectorAll(".segmented button").forEach(button=>button.onclick=()=>{if(performance.now()<suppressFilterClickUntil)return;setChatFilter(button.dataset.filter)});
+  filterSwipeSurface.addEventListener("pointerdown",event=>{if(event.pointerType==="mouse"&&event.button!==0)return;if(event.target.closest(".chat-row-wrap,.search"))return;folderSwipeStart={x:event.clientX,y:event.clientY};const tab=event.target.closest("button[data-filter]");try{(tab||filterSwipeSurface).setPointerCapture(event.pointerId)}catch{}});
+  filterSwipeSurface.addEventListener("pointerup",event=>{if(!folderSwipeStart)return;const dx=event.clientX-folderSwipeStart.x,dy=event.clientY-folderSwipeStart.y;folderSwipeStart=null;if(Math.abs(dx)<48||Math.abs(dx)<Math.abs(dy)*1.2)return;suppressFilterClickUntil=performance.now()+400;const index=filterOrder.indexOf(state.filter),nextIndex=Math.max(0,Math.min(filterOrder.length-1,index+(dx<0?1:-1)));setChatFilter(filterOrder[nextIndex])});
+  filterSwipeSurface.addEventListener("pointercancel",()=>{folderSwipeStart=null});
+  filterTabs.addEventListener("keydown",event=>{if(event.key!=="ArrowLeft"&&event.key!=="ArrowRight")return;const index=filterOrder.indexOf(state.filter),nextIndex=Math.max(0,Math.min(filterOrder.length-1,index+(event.key==="ArrowRight"?1:-1)));if(nextIndex!==index){event.preventDefault();setChatFilter(filterOrder[nextIndex]);filterTabs.querySelector(`[data-filter="${filterOrder[nextIndex]}"]`)?.focus()}});
+  syncChatFilterTabs();byId("searchChats").oninput=renderChats;
   document.addEventListener("click",event=>{if(event.target.closest(".chat-row-wrap"))return;document.querySelectorAll(".chat-row-wrap.revealed").forEach(row=>row.classList.remove("revealed"))});
   function closeChatWithAnimation(){
     const conversation=byId("conversation");
@@ -485,8 +655,31 @@
   }
   byId("backChats").onclick=closeChatWithAnimation;
   function updateComposerActions(){const hasText=byId("messageInput").value.trim().length>0;byId("micBtn").classList.toggle("is-hidden",hasText);byId("sendBtn").classList.toggle("is-hidden",!hasText)}
-  byId("messageInput").addEventListener("input",updateComposerActions);
-  byId("messageForm").onsubmit=e=>{e.preventDefault();const input=byId("messageInput"),text=input.value.trim(),c=current();if(!text||!c)return;if(c.kind==="personal"&&isBlocked(c.name)){toast("Пользователь заблокирован");return}const createdAt=Date.now(),msg={id:createdAt,createdAt,from:state.user.name,text,replyTo:replyToId,time:formatMessageTime(createdAt),mine:true,read:false};(state.messages[c.id]||(state.messages[c.id]=[])).push(msg);c.preview=text;c.time="сейчас";c.updatedAt=createdAt;persist();input.value="";clearReply();updateComposerActions();renderMessages(false,true);renderChats()};
+  function resizeMessageInput(){const input=byId("messageInput");input.style.height="auto";const outerHeight=input.scrollHeight+2;input.style.height=`${Math.min(outerHeight,102)}px`;input.style.overflowY=outerHeight>102?"auto":"hidden"}
+  byId("messageInput").addEventListener("input",()=>{updateComposerActions();resizeMessageInput()});
+  byId("messageInput").addEventListener("keydown",event=>{if(event.key==="Enter"&&!event.shiftKey&&!event.isComposing){event.preventDefault();if(byId("messageInput").value.trim())byId("messageForm").requestSubmit()}});
+  byId("chatMessageSearch").addEventListener("input",()=>{messageSearchIndex=0;refreshMessageSearch();if(messageSearchMatches[0])byId(`message-${messageSearchMatches[0].id}`)?.scrollIntoView({behavior:"smooth",block:"center"})});
+  byId("chatSearchPrev").onclick=()=>stepMessageSearch(-1);byId("chatSearchNext").onclick=()=>stepMessageSearch(1);byId("chatSearchClose").onclick=closeMessageSearch;
+  byId("messageForm").onsubmit=e=>{e.preventDefault();const input=byId("messageInput"),text=input.value.trim(),c=current();if(!text||!c)return;if(c.kind==="personal"&&isBlocked(c.name)){toast("Пользователь заблокирован");return}const createdAt=Date.now(),msg={id:createdAt,createdAt,from:state.user.name,text,replyTo:replyToId,time:formatMessageTime(createdAt),mine:true,read:false};(state.messages[c.id]||(state.messages[c.id]=[])).push(msg);c.preview=text;c.time="сейчас";c.updatedAt=createdAt;persist();input.value="";resizeMessageInput();clearReply();updateComposerActions();renderMessages(false,true);renderChats()};
+  function openForwardDialog(messageId){
+    const sourceChat=current(),source=(state.messages[sourceChat?.id]||[]).find(message=>Number(message.id)===Number(messageId));if(!source)return;
+    const recipients=state.chats.filter(chat=>chat.id!==sourceChat.id);if(!recipients.length){toast("Нет других чатов для пересылки");return}
+    const originName=source.forwardedFrom?.name||source.from||state.user.name,originUsername=normalizeUsername(source.forwardedFrom?.username||usernameForName(originName));
+    const backdrop=byId("modalBack"),content=byId("modalContent");
+    content.innerHTML=`<h3 id="forwardMessageTitle">Переслать сообщение</h3><p>Автор сообщения: <button class="forward-author-link" type="button" data-forward-profile="${escapeHTML(originName)}">@${escapeHTML(originUsername)}</button></p><div class="forward-chat-list">${recipients.map(chat=>`<button type="button" class="forward-chat-option" data-forward-target="${escapeHTML(chat.id)}">${avatar(chat.avatar||chat.name[0],chat.cls)}<span>${escapeHTML(chat.name)}<small>${chat.kind==="group"?"Группа":"Личный чат"}</small></span></button>`).join("")}</div><div class="modal-actions"><button class="secondary-btn" id="cancelForward" type="button">Отмена</button></div>`;
+    content.setAttribute("role","dialog");content.setAttribute("aria-modal","true");content.setAttribute("aria-labelledby","forwardMessageTitle");
+    const close=()=>{backdrop.onclick=null;document.removeEventListener("keydown",onKeyDown);closePopup(backdrop)};
+    const onKeyDown=event=>{if(event.key==="Escape")close()};
+    openPopup(backdrop);backdrop.onclick=event=>{if(event.target===backdrop)close()};document.addEventListener("keydown",onKeyDown);
+    content.querySelector("[data-forward-profile]").onclick=()=>{close();openUserProfile(originName)};
+    content.querySelector("#cancelForward").onclick=close;
+    content.querySelectorAll("[data-forward-target]").forEach(button=>button.onclick=()=>{
+      const target=state.chats.find(chat=>String(chat.id)===button.dataset.forwardTarget);if(!target)return;
+      if(target.kind==="personal"&&isBlocked(target.name)){toast("Пользователь заблокирован");return}
+      const createdAt=Date.now(),copy={...source,id:createdAt,createdAt,from:state.user.name,time:formatMessageTime(createdAt),mine:true,read:false,replyTo:null,reaction:false,edited:false,forwardedFrom:{name:originName,username:originUsername}};
+      (state.messages[target.id]||(state.messages[target.id]=[])).push(copy);target.preview=messageSummary(source);target.updatedAt=createdAt;target.time="сейчас";persist();renderChats();close();toast(`Переслано в «${target.name}»`);
+    });
+  }
   window.editMessage=id=>{const m=(state.messages[state.activeChat]||[]).find(x=>x.id===id);if(!m||!m.mine)return;const val=prompt("Изменить сообщение:",m.text);if(val!==null&&val.trim()){m.text=val.trim();m.edited=true;persist();renderMessages(true);toast("Сообщение изменено")}};
   window.deleteMessage=async id=>{
     const chat=current(),messages=state.messages[state.activeChat]||[],message=messages.find(item=>Number(item.id)===Number(id));
@@ -495,7 +688,7 @@
     const wasLatest=messages[messages.length-1]===message;
     state.messages[state.activeChat]=messages.filter(item=>item!==message);
     if(chat.pinnedMessageId===message.id)chat.pinnedMessageId=null;
-    if(message.mediaId)removeStoredMedia(message.mediaId);
+    if(message.mediaId&&!Object.values(state.messages).some(chatMessages=>chatMessages.some(item=>item.mediaId===message.mediaId)))removeStoredMedia(message.mediaId);
     if(wasLatest){const latest=state.messages[state.activeChat].at(-1);chat.preview=latest?messageSummary(latest):"Нет сообщений";chat.updatedAt=latest?.createdAt||Date.now()}
     persist();renderMessages(true);renderChats();toast("Сообщение удалено");
   };
@@ -508,18 +701,33 @@
   };
   const micMarkup='<svg class="mic-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21m-4 0h8"/></svg>';
   const videoMarkup='<svg class="video-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="3"/><path d="m16 10 5-3v10l-5-3z"/></svg>';
-  let recordMode="voice",timer=null,pressTimer=null,recordingStarted=false,longPressTriggered=false,recordingStream=null,mediaRecorder=null,recorderStarting=false,recordingCancelled=false,holdReleased=false,recordChunks=[],recordingKind=null,recordingStartedAt=0,seconds=0,recordingPoster="";
+  let recordMode="voice",timer=null,pressTimer=null,recordingStarted=false,longPressTriggered=false,recordingStream=null,cameraInputStream=null,videoCanvas=null,videoCanvasContext=null,videoFrameHandle=0,cameraFacingMode="user",mediaRecorder=null,recorderStarting=false,recordingCancelled=false,holdReleased=false,recordChunks=[],recordingKind=null,recordingStartedAt=0,seconds=0,recordingPoster="";
   function setRecordMode(mode){recordMode=mode;const video=mode==="video";byId("micBtn").innerHTML=video?videoMarkup:micMarkup;byId("micBtn").title=video?"Нажмите для смены режима, удерживайте для записи кружка":"Нажмите для смены режима, удерживайте для записи голосового";byId("micBtn").setAttribute("aria-label",video?"Переключить на голосовое сообщение":"Переключить на видеосообщение")}
   setRecordMode(recordMode);
   function elapsedLabel(value){return `${String(Math.floor(value/60)).padStart(2,"0")}:${String(value%60).padStart(2,"0")}`}
-  function stopCameraAndMicrophone(stream){stream?.getTracks().forEach(track=>track.stop())}
+  function drawRecordingFrame(){
+    const video=byId("videoPreview");
+    if(videoCanvas&&videoCanvasContext&&video?.readyState>=2){const side=Math.min(video.videoWidth,video.videoHeight),x=(video.videoWidth-side)/2,y=(video.videoHeight-side)/2;videoCanvasContext.drawImage(video,x,y,side,side,0,0,videoCanvas.width,videoCanvas.height)}
+    videoFrameHandle=requestAnimationFrame(drawRecordingFrame);
+  }
+  function createVideoRecordingStream(cameraStream){
+    const canvas=document.createElement("canvas");canvas.width=480;canvas.height=480;
+    const context=canvas.getContext("2d");if(!context||!canvas.captureStream)throw new Error("Запись видео не поддерживается этим браузером");
+    videoCanvas=canvas;videoCanvasContext=context;const output=canvas.captureStream(30);
+    cameraStream.getAudioTracks().forEach(track=>output.addTrack(track));drawRecordingFrame();return output;
+  }
+  function stopCameraAndMicrophone(stream){
+    const tracks=new Set([...(stream?.getTracks()||[]),...(cameraInputStream?.getTracks()||[])]);tracks.forEach(track=>track.stop());cameraInputStream=null;
+    if(videoFrameHandle)cancelAnimationFrame(videoFrameHandle);videoFrameHandle=0;videoCanvas=null;videoCanvasContext=null;
+  }
   function resetRecorderUi(){
     clearInterval(timer);timer=null;
     const activeChat=current();
     byId("messageInput").disabled=!activeChat||(activeChat.kind==="personal"&&isBlocked(activeChat.name));
     byId("recordingNote").classList.remove("on");
-    byId("videoRecordOverlay").classList.remove("open");byId("videoRecordOverlay").setAttribute("aria-hidden","true");
-    const preview=byId("videoPreview");preview.pause();preview.srcObject=null;preview.closest(".record-circle").classList.remove("has-preview");
+    closePopup(byId("videoRecordOverlay"));byId("videoRecordOverlay").setAttribute("aria-hidden","true");
+    const preview=byId("videoPreview");preview.pause();preview.srcObject=null;preview.classList.remove("rear-camera");preview.closest(".record-circle").classList.remove("has-preview");
+    byId("toggleCameraBtn").disabled=true;byId("toggleCameraBtn").title="Переключить камеру";cameraFacingMode="user";
     byId("micBtn").classList.remove("recording");setRecordMode(recordMode);updateComposerActions();
     byId("overlayRecordTimer").textContent="00:00";byId("recordTimer").textContent="00:00";
     recordingStarted=false;recorderStarting=false;recordingCancelled=false;holdReleased=false;recordingKind=null;recordingPoster="";recordChunks=[];
@@ -532,11 +740,15 @@
     const mode=recordMode;recordingKind=mode;recorderStarting=true;recordingCancelled=false;recordChunks=[];seconds=0;byId("messageInput").disabled=true;
     try{
       await showPermissionHintIfNeeded(mode);
-      const stream=await navigator.mediaDevices.getUserMedia(mode==="video"?{audio:true,video:{width:{ideal:480},height:{ideal:480},facingMode:"user"}}:{audio:true});
-      recordingStream=stream;
-      if(recordingCancelled||!current()){stopCameraAndMicrophone(stream);recordingStream=null;resetRecorderUi();return}
+      cameraFacingMode="user";
+      const sourceStream=await navigator.mediaDevices.getUserMedia(mode==="video"?{audio:true,video:{width:{ideal:480},height:{ideal:480},facingMode:{ideal:cameraFacingMode}}}:{audio:true});
+      if(mode==="video"){
+        cameraInputStream=sourceStream;const preview=byId("videoPreview");preview.srcObject=sourceStream;preview.classList.remove("rear-camera");preview.closest(".record-circle").classList.add("has-preview");
+        await preview.play().catch(()=>{});recordingStream=createVideoRecordingStream(sourceStream);
+      }else recordingStream=sourceStream;
+      if(recordingCancelled||!current()){stopCameraAndMicrophone(recordingStream||sourceStream);recordingStream=null;resetRecorderUi();return}
       const mimeType=selectRecorderMime(mode),options=mimeType?{mimeType}:undefined;
-      const recorder=new MediaRecorder(stream,options);mediaRecorder=recorder;
+      const recorder=new MediaRecorder(recordingStream,options);mediaRecorder=recorder;
       recorder.ondataavailable=event=>{if(event.data?.size)recordChunks.push(event.data)};
       recorder.onerror=()=>{recordingCancelled=true;try{recorder.stop()}catch{}toast("Не удалось записать сообщение")};
       recorder.onstop=async()=>{
@@ -556,14 +768,13 @@
       recorder.start(250);recorderStarting=false;
       byId("messageInput").disabled=true;byId("micBtn").classList.add("recording");byId("micBtn").innerHTML='<span class="stop-icon" aria-hidden="true">■</span>';byId("micBtn").title="Запись идёт";
       if(mode==="video"){
-        byId("videoRecordOverlay").classList.add("open");byId("videoRecordOverlay").setAttribute("aria-hidden","false");
-        const preview=byId("videoPreview");preview.srcObject=stream;preview.closest(".record-circle").classList.add("has-preview");
-        await preview.play().catch(()=>{});recordingPoster=createVideoPoster(preview);
+        openPopup(byId("videoRecordOverlay"));byId("videoRecordOverlay").setAttribute("aria-hidden","false");
+        byId("toggleCameraBtn").disabled=false;byId("toggleCameraBtn").title="Переключить на основную камеру";recordingPoster=createVideoPoster(byId("videoPreview"));
       }else{
         byId("recordingLabel").textContent="Запись голосового…";byId("recordingNote").classList.add("on");
       }
       recordingStartedAt=Date.now();
-      timer=setInterval(()=>{seconds=Math.floor((Date.now()-recordingStartedAt)/1000);const label=elapsedLabel(seconds);byId("recordTimer").textContent=label;byId("overlayRecordTimer").textContent=label},250);
+      timer=setInterval(()=>{seconds=Math.floor((Date.now()-recordingStartedAt)/1000);if(recordingKind==="video"&&seconds>=60){seconds=60;byId("overlayRecordTimer").textContent="01:00";toast("Достигнут лимит видеосообщения — 1 минута");stopRecording(false);return}const label=elapsedLabel(seconds);byId("recordTimer").textContent=label;byId("overlayRecordTimer").textContent=label},250);
       if(mode==="voice"&&holdReleased)setTimeout(()=>stopRecording(false),450);
     }catch(error){
       stopCameraAndMicrophone(recordingStream);recordingStream=null;mediaRecorder=null;resetRecorderUi();
@@ -571,15 +782,35 @@
       toast(reason);
     }
   }
+  async function switchVideoCamera(){
+    if(recordingKind!=="video"||!cameraInputStream)return;
+    const button=byId("toggleCameraBtn"),preview=byId("videoPreview"),previousFacing=cameraFacingMode,nextFacing=previousFacing==="user"?"environment":"user",previousStream=cameraInputStream;let nextStream=null,previousTrackReleased=false;
+    button.disabled=true;
+    try{
+      const constraints={audio:false,video:{width:{ideal:480},height:{ideal:480},facingMode:{exact:nextFacing}}};
+      try{nextStream=await navigator.mediaDevices.getUserMedia(constraints)}catch(firstError){previousStream.getVideoTracks().forEach(track=>track.stop());previousTrackReleased=true;nextStream=await navigator.mediaDevices.getUserMedia(constraints)}
+      if(recordingCancelled||recordingKind!=="video"||!mediaRecorder||mediaRecorder.state==="inactive"){nextStream.getTracks().forEach(track=>track.stop());return}
+      preview.srcObject=nextStream;await preview.play();
+      cameraInputStream=nextStream;cameraFacingMode=nextFacing;previousStream.getVideoTracks().forEach(track=>track.stop());
+      preview.classList.toggle("rear-camera",cameraFacingMode==="environment");recordingPoster=createVideoPoster(preview);
+      button.title=cameraFacingMode==="user"?"Переключить на основную камеру":"Переключить на фронтальную камеру";
+    }catch(error){
+      nextStream?.getTracks().forEach(track=>track.stop());
+      if(recordingCancelled||recordingKind!=="video"||!mediaRecorder)return;
+      if(previousTrackReleased){try{const restored=await navigator.mediaDevices.getUserMedia({audio:false,video:{width:{ideal:480},height:{ideal:480},facingMode:{exact:previousFacing}}});cameraInputStream=restored;preview.srcObject=restored;await preview.play().catch(()=>{})}catch{cameraInputStream=null;toast("Камера недоступна. Запись отменена.");stopRecording(true);return}}
+      else{preview.srcObject=previousStream;preview.play().catch(()=>{})}
+      toast(error.name==="NotFoundError"||error.name==="OverconstrainedError"?"Эта камера недоступна":"Не удалось переключить камеру");
+    }finally{button.disabled=false}
+  }
   function stopRecording(cancel=false){
     if(cancel)recordingCancelled=true;
     if(recorderStarting&&!mediaRecorder)return;
     if(mediaRecorder&&mediaRecorder.state!=="inactive")mediaRecorder.stop();
   }
-  function closeVideoPlayback(){const overlay=byId("videoPlaybackOverlay"),video=byId("videoPlaybackMedia");video.pause();video.removeAttribute("src");video.load();video.classList.remove("active");byId("videoPlaybackFallback").hidden=false;overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true")}
+  function closeVideoPlayback(){const overlay=byId("videoPlaybackOverlay"),video=byId("videoPlaybackMedia");video.pause();video.removeAttribute("src");video.load();video.classList.remove("active");byId("videoPlaybackFallback").hidden=false;closePopup(overlay);overlay.setAttribute("aria-hidden","true")}
   async function playVideoMessage(id){
     if(!id){toast("Для этого старого демо-сообщения нет сохранённой видеозаписи");return}
-    try{const video=byId("videoPlaybackMedia");video.src=await loadStoredMedia(id);video.classList.add("active");byId("videoPlaybackFallback").hidden=true;byId("videoPlaybackOverlay").classList.add("open");byId("videoPlaybackOverlay").setAttribute("aria-hidden","false");await video.play()}
+    try{const video=byId("videoPlaybackMedia");video.src=await loadStoredMedia(id);video.classList.add("active");byId("videoPlaybackFallback").hidden=true;openPopup(byId("videoPlaybackOverlay"));byId("videoPlaybackOverlay").setAttribute("aria-hidden","false");await video.play()}
     catch(error){closeVideoPlayback();toast(error.message||"Не удалось воспроизвести видеосообщение")}
   }
   byId("micBtn").addEventListener("pointerdown",event=>{
@@ -595,40 +826,54 @@
   });
   byId("micBtn").addEventListener("pointercancel",()=>{clearTimeout(pressTimer);if(longPressTriggered)stopRecording(true);recordingStarted=false;longPressTriggered=false});
   byId("micBtn").onclick=event=>{if(event.detail===0&&!mediaRecorder&&!recorderStarting)setRecordMode(recordMode==="voice"?"video":"voice")};
-  byId("cancelReply").onclick=()=>clearReply();byId("cancelRecording").onclick=()=>stopRecording(true);byId("videoRecordCancel").onclick=()=>stopRecording(true);byId("videoRecordSend").onclick=()=>stopRecording(false);byId("chatInfo").onclick=openChatInfo;byId("convAvatarLink").onclick=openChatInfo;
+  byId("cancelReply").onclick=()=>clearReply();byId("cancelRecording").onclick=()=>stopRecording(true);byId("videoRecordCancel").onclick=()=>stopRecording(true);byId("videoRecordSend").onclick=()=>stopRecording(false);byId("toggleCameraBtn").onclick=switchVideoCamera;byId("chatSearchBtn").onclick=openMessageSearch;byId("convAvatarLink").onclick=openChatInfo;
   byId("messages").addEventListener("click",e=>{const menuButton=e.target.closest("[data-message-actions]");if(menuButton){const menu=menuButton.closest(".msg-actions"),wasOpen=menu.classList.contains("open");document.querySelectorAll(".msg-actions.open").forEach(open=>{if(open!==menu){open.classList.remove("open");open.querySelector("[data-message-actions]")?.setAttribute("aria-expanded","false")}});menu.classList.toggle("open",!wasOpen);menuButton.setAttribute("aria-expanded",String(!wasOpen));return}const menuAction=e.target.closest(".msg-action-list");if(menuAction){const menu=menuAction.closest(".msg-actions");menu?.classList.remove("open");menu?.querySelector("[data-message-actions]")?.setAttribute("aria-expanded","false");return}const avatarButton=e.target.closest("[data-user]");if(avatarButton){openUserProfile(avatarButton.dataset.user);return}const reaction=e.target.closest(".reaction-chip");if(reaction){const parent=reaction.closest(".bubble"),id=Number(parent?.dataset.messageId),msg=(state.messages[state.activeChat]||[]).find(x=>x.id===id);if(msg)setMessageReaction(id,false);return}const videoNote=e.target.closest("[data-video-play]");if(videoNote){playVideoMessage(videoNote.dataset.mediaId);return}const quote=e.target.closest("[data-reply-target]");if(quote){byId(`message-${quote.dataset.replyTarget}`)?.scrollIntoView({behavior:"smooth",block:"center"});return}const bubble=e.target.closest(".bubble");if(!bubble||e.target.closest(".msg-actions")||e.target.closest("audio"))return;const id=Number(bubble.dataset.messageId),now=Date.now();if(lastMessageTap.id===id&&now-lastMessageTap.time<420){const msg=(state.messages[state.activeChat]||[]).find(x=>x.id===id);if(msg)setMessageReaction(id,!msg.reaction);lastMessageTap={id:null,time:0}}else lastMessageTap={id,time:now}});
+  byId("messages").addEventListener("click",e=>{const forwardButton=e.target.closest("[data-forward-message]");if(!forwardButton)return;e.stopPropagation();openForwardDialog(Number(forwardButton.dataset.forwardMessage))});
   document.addEventListener("click",e=>{if(e.target.closest(".msg-actions"))return;document.querySelectorAll(".msg-actions.open").forEach(menu=>{menu.classList.remove("open");menu.querySelector("[data-message-actions]")?.setAttribute("aria-expanded","false")})});
   document.addEventListener("click",e=>{const userButton=e.target.closest("[data-user]");if(userButton&&!byId("messages").contains(userButton))openUserProfile(userButton.dataset.user)});
+  byId("pagePanel").addEventListener("click",event=>{if(event.target.closest("#registrationToggle")){state.registrationOpen=!state.registrationOpen;persist();renderPage("owner");toast(state.registrationOpen?"Регистрация открыта":"Регистрация закрыта");return}if(event.target.closest("#ownerParticipantsBtn")){nav("ownerMembers");return}if(event.target.closest("#ownerMembersBack"))nav("owner")});
   document.addEventListener("click",e=>{const pick=e.target.closest("[data-pick-login]");if(pick){(pick.dataset.pickMode==="add"?selectedAddUsers:selectedGroupUsers).add(pick.dataset.pickLogin);refreshPersonPickers();return}const remove=e.target.closest("[data-remove-login]");if(remove){(remove.dataset.pickMode==="add"?selectedAddUsers:selectedGroupUsers).delete(remove.dataset.removeLogin);refreshPersonPickers()}});
   byId("videoPlaybackOverlay").addEventListener("click",e=>{if(e.target===byId("videoPlaybackOverlay")||e.target.closest("#closeVideoPlayback"))closeVideoPlayback()});
+  byId("videoPlaybackFallback").onclick=()=>byId("videoPlaybackMedia").play().catch(()=>{});
+  byId("videoPlaybackMedia").addEventListener("click",()=>{const video=byId("videoPlaybackMedia");if(video.paused)video.play().catch(()=>{});else video.pause()});
+  byId("videoPlaybackMedia").addEventListener("play",()=>{byId("videoPlaybackFallback").hidden=true});
+  byId("videoPlaybackMedia").addEventListener("pause",()=>{if(byId("videoPlaybackMedia").classList.contains("active"))byId("videoPlaybackFallback").hidden=false});
   byId("jumpToPinnedMessage").onclick=()=>{const chat=current();if(chat?.pinnedMessageId)byId(`message-${chat.pinnedMessageId}`)?.scrollIntoView({behavior:"smooth",block:"center"})};
   byId("unpinMessage").onclick=()=>{const chat=current();if(chat?.pinnedMessageId)window.togglePinnedMessage(chat.pinnedMessageId)};
   byId("messages").addEventListener("pointerdown",e=>{const bubble=e.target.closest(".bubble");if(!bubble||e.target.closest(".msg-actions"))return;const id=Number(bubble.dataset.messageId);gestureState={id,x:e.clientX,y:e.clientY,moved:false};clearTimeout(longPressTimer);longPressTimer=setTimeout(()=>{if(gestureState&&!gestureState.moved){setReply(id);gestureState.moved=true}},500)});
   byId("messages").addEventListener("pointermove",e=>{if(!gestureState)return;const dx=e.clientX-gestureState.x,dy=e.clientY-gestureState.y;if(dx < -58&&Math.abs(dy)<48){clearTimeout(longPressTimer);if(!gestureState.moved)setReply(gestureState.id);gestureState.moved=true}else if(Math.abs(dx)>18||Math.abs(dy)>18)clearTimeout(longPressTimer)});
   ["pointerup","pointercancel","pointerleave"].forEach(type=>byId("messages").addEventListener(type,()=>{clearTimeout(longPressTimer);gestureState=null}));
+  byId("messages").addEventListener("click",event=>{if(!window.matchMedia("(hover:none)").matches)return;const line=event.target.closest(".msg-line");document.querySelectorAll(".msg-line.actions-visible").forEach(item=>{if(item!==line)item.classList.remove("actions-visible")});if(!line||event.target.closest(".msg-actions"))return;line.classList.add("actions-visible")});
   function renderPage(page){let html="";if(page==="contacts"){html=`<h1 class="page-title">Контакты</h1><div class="panel-card"><div class="contacts-toolbar"><label class="search"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 4.2 4.2"/></svg><input id="contactSearch" placeholder="Поиск по юзернейму" autocomplete="off"></label><button class="primary-btn" id="newGroupBtn">＋ Новая группа</button></div><div class="panel-card group-create-panel" id="groupCreatePanel" hidden><label class="field"><span>Название группы</span><input id="groupName" placeholder="Например, Выходные"></label><label class="search"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 4.2 4.2"/></svg><input id="groupMemberSearch" placeholder="Поиск по юзернейму"></label><div class="group-search-results" id="groupMemberResults"></div><div class="selected-member-chips" id="groupSelectedMembers"></div><div class="btns"><button class="primary-btn" id="createGroupBtn">Создать группу</button><button class="secondary-btn" id="cancelGroupBtn">Отмена</button></div></div><div class="contact-list" id="contactRows">${contactRows()}</div></div>`}
-    else if(page==="profile"){html=`<h1 class="page-title">Настройки</h1><p class="page-sub">Настройки аккаунта и приложения</p><div class="profile-grid"><div class="panel-card"><div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">${userAvatar("a2")}<div><div class="contact-name">${escapeHTML(state.user.name)}</div><div class="contact-sub">@${escapeHTML(state.user.login)} · ${state.user.role==="owner"?"владелец":"участник"}</div></div></div><button class="secondary-btn avatar-upload" id="changeAvatar">${state.user.photo?"Изменить фото":"＋ Добавить фото профиля"}</button><input id="avatarFile" type="file" accept="image/*" hidden><label class="field"><span>Имя</span><input id="profileName" value="${escapeHTML(state.user.name)}"></label><label class="field"><span>Юзернейм</span><input id="profileUsername" value="${escapeHTML(state.user.login)}" autocomplete="username"></label><button class="primary-btn" id="saveProfile">Сохранить изменения</button></div><div class="panel-card"><div class="contact-name" style="margin-bottom:10px">Внешний вид</div><div class="setting-row"><span>Тёмная тема</span><input class="switch" type="checkbox" id="themeToggle" ${state.theme==="dark"?"checked":""}></div>${state.user.role==="owner"?`<button class="secondary-btn" style="margin-top:16px;display:flex;align-items:center;gap:9px" id="ownerPanelBtn"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:19px;height:19px;stroke:currentColor;stroke-width:1.8;fill:none"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>Панель владельца</button>`:""}</div></div><div class="panel-card logout-card"><button class="secondary-btn" id="logoutBtn">Выйти из аккаунта</button></div><div class="panel-card"><div class="contact-name">О прототипе</div><p class="page-sub" style="margin:8px 0 0">FAM — прототип. Аккаунты и сообщения существуют только в этом браузере; пароль проверяется локально и не защищён сервером. Серверная база, защищённая авторизация, синхронизация между устройствами и реальная доставка сообщений не подключены.</p></div>`}
-    else if(page==="userProfile"){const person=viewedUser||{name:"Пользователь",login:"user",online:false};const blocked=isBlocked(person.name),canBlock=normalizeUsername(person.login)!==normalizeUsername(state.user.login);html=`<button class="page-back" id="userProfileBack"><svg class="back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Назад</button><h1 class="page-title">Профиль пользователя</h1><div class="panel-card user-profile-card"><div class="user-profile-avatar">${avatar((person.name||"?")[0],person.cls||"")}</div><div class="contact-name user-profile-name">${escapeHTML(person.name)}</div><div class="contact-sub">@${escapeHTML(person.login)}${person.online?" · в сети":""}</div><div class="user-profile-actions">${canBlock?`<button class="secondary-btn block-user-btn" id="blockUserBtn">${blocked?"Разблокировать":"Заблокировать"}</button>`:""}${blocked?`<div class="blocked-note">Пользователь заблокирован. Отправка сообщений недоступна.</div>`:""}<button class="secondary-btn" id="returnToChat">Написать</button></div></div>`}
-    else if(page==="groupMembers"){const c=current(),members=c.members||[];html=`<button class="page-back" id="groupBack"><svg class="back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Назад</button><h1 class="page-title">Участники</h1><p class="page-sub">${escapeHTML(c.name)} · ${members.length} участников</p><div class="panel-card"><button class="secondary-btn" id="addGroupPeopleBtn">＋ Добавить участников</button><div class="panel-card group-create-panel" id="addGroupPeoplePanel" hidden><label class="search"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 4.2 4.2"/></svg><input id="addMemberSearch" placeholder="Поиск по юзернейму"></label><div class="group-search-results" id="addMemberResults"></div><div class="selected-member-chips" id="addSelectedMembers"></div><button class="primary-btn" id="confirmGroupPeopleBtn">Добавить выбранных</button></div><div class="group-members">${members.map(name=>{const person=state.contacts.find(x=>x.name===name)||{},login=person.login||(name===state.user.name?state.user.login:name.toLowerCase().replace(/\s/g,"")),cls=person.cls||(name===state.user.name?"a2":"");return `<button class="group-member-button" data-user="${escapeHTML(name)}">${avatar(name[0],cls)}<span class="group-member-meta"><strong>${escapeHTML(name)}${name===state.user.name?" · вы":""}</strong><small>@${escapeHTML(login)}${isPersonOnline(name)?" · в сети":""}</small></span></button>`}).join("")}</div></div>`}
-    else if(page==="owner"){html=`<div class="eyebrow">Управление пространством</div><h1 class="page-title">Панель владельца</h1><p class="page-sub">Настройки семейного пространства</p><div class="profile-grid"><div class="panel-card"><div class="contact-name">Семья Малигиных</div><div class="setting-row"><span>Участники</span><strong>${state.accounts.length}</strong></div><div class="setting-row"><span>Регистрация</span><span class="pill">Открыта</span></div><div class="setting-row"><span>Администратор</span><span class="pill">Владелец семьи</span></div></div><div class="panel-card"><div class="contact-name">Регистрация FAM</div><p class="page-sub" style="margin:8px 0 0">Новые участники могут создать аккаунт и сразу войти. Юзернеймы должны быть уникальными и состоять из латинских букв и цифр.</p></div></div>`}
-    byId("pagePanel").innerHTML=html;const toggle=byId("themeToggle");if(toggle)toggle.onchange=()=>setTheme(toggle.checked?"dark":"light");const save=byId("saveProfile");if(save)save.onclick=()=>{const rawUsername=byId("profileUsername").value.trim(),username=normalizeUsername(rawUsername);if(!validUsername(rawUsername)){toast("Юзернейм: только латинские буквы и цифры");return}if(usernameTaken(username,true)){toast("Этот юзернейм уже занят");return}const oldName=state.user.name,oldLogin=state.user.login,newName=byId("profileName").value.trim()||oldName;state.user.name=newName;state.user.login=username;const account=state.accounts.find(a=>normalizeUsername(a.login)===normalizeUsername(oldLogin));if(account){account.name=newName;account.login=username}const ownContact=state.contacts.find(c=>c.name===oldName&&normalizeUsername(c.login)===normalizeUsername(oldLogin));if(ownContact){ownContact.name=newName;ownContact.login=username}refreshSidebarProfile();persist();nav("profile");toast("Профиль обновлён")};const logout=byId("logoutBtn");if(logout)logout.onclick=()=>showAuth("login");const returnToChat=byId("returnToChat");if(returnToChat)returnToChat.onclick=()=>openContactChat(viewedUser.name);const userProfileBack=byId("userProfileBack");if(userProfileBack)userProfileBack.onclick=()=>nav("chats");const groupBack=byId("groupBack");if(groupBack)groupBack.onclick=()=>nav("chats");const blockUser=byId("blockUserBtn");if(blockUser)blockUser.onclick=()=>{const username=normalizeUsername(viewedUser.login);if(state.blockedUsers.includes(username))state.blockedUsers=state.blockedUsers.filter(x=>x!==username);else state.blockedUsers.push(username);persist();if(current().kind==="personal")renderMessages();nav("userProfile")};const addPeopleBtn=byId("addGroupPeopleBtn");if(addPeopleBtn)addPeopleBtn.onclick=()=>{const panel=byId("addGroupPeoplePanel");panel.hidden=!panel.hidden;if(!panel.hidden){selectedAddUsers=new Set();byId("addMemberSearch").value="";refreshPersonPickers()}};const addMemberSearch=byId("addMemberSearch");if(addMemberSearch)addMemberSearch.oninput=refreshPersonPickers;const groupMemberSearch=byId("groupMemberSearch");if(groupMemberSearch)groupMemberSearch.oninput=refreshPersonPickers;const confirmPeople=byId("confirmGroupPeopleBtn");if(confirmPeople)confirmPeople.onclick=()=>{const c=current(),selected=[...selectedAddUsers],added=state.contacts.filter(person=>selected.includes(person.login)&&!c.members.includes(person.name));c.members=[...(c.members||[]),...added.map(person=>person.name)];c.online=`${c.members.length} участников`;c.updatedAt=Date.now();persist();nav("groupMembers");toast(added.length?"Участники добавлены":"Выберите людей для добавления")};const contactSearch=byId("contactSearch");if(contactSearch)contactSearch.oninput=()=>{byId("contactRows").innerHTML=contactRows(contactSearch.value);bindContactButtons(byId("contactRows"))};bindContactButtons(byId("contactRows")||document);const newGroup=byId("newGroupBtn");if(newGroup)newGroup.onclick=()=>{const box=byId("groupCreatePanel");box.hidden=!box.hidden;if(!box.hidden){selectedGroupUsers=new Set();byId("groupMemberSearch").value="";refreshPersonPickers();byId("groupName").focus()}};const cancelGroup=byId("cancelGroupBtn");if(cancelGroup)cancelGroup.onclick=()=>byId("groupCreatePanel").hidden=true;const createGroup=byId("createGroupBtn");if(createGroup)createGroup.onclick=()=>{const name=byId("groupName").value.trim(),selected=[...selectedGroupUsers],people=state.contacts.filter(person=>selected.includes(person.login));if(!name){toast("Введите название группы");return}if(!people.length){toast("Добавьте хотя бы одного участника");return}const id=`group-${Date.now()}`,members=[state.user.name,...people.map(person=>person.name)],group={id,name,kind:"group",avatar:name[0],cls:"a3",time:"сейчас",preview:"Группа создана",unread:0,online:`${members.length} участников`,members,updatedAt:Date.now()};state.chats.unshift(group);state.messages[id]=[];persist();selectChat(id)};const ownerPanel=byId("ownerPanelBtn");if(ownerPanel)ownerPanel.onclick=()=>nav("owner");}
+    else if(page==="profile"){html=`<h1 class="page-title">Настройки</h1><p class="page-sub">Настройки аккаунта и приложения</p><div class="profile-grid"><div class="panel-card"><div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">${userAvatar("a2")}<div><div class="contact-name profile-user-name">${escapeHTML(state.user.name)}</div><div class="contact-sub">@${escapeHTML(state.user.login)} · ${state.user.role==="owner"?(state.language==="en"?"owner":"владелец"):(state.language==="en"?"member":"участник")}</div></div></div><button class="secondary-btn avatar-upload" id="changeAvatar">${state.user.photo?"Изменить фото":"＋ Добавить фото профиля"}</button><input id="avatarFile" type="file" accept="image/*" hidden><label class="field"><span>Имя</span><input id="profileName" value="${escapeHTML(state.user.name)}"></label><label class="field"><span>Юзернейм</span><input id="profileUsername" value="${escapeHTML(state.user.login)}" autocomplete="username"></label><button class="primary-btn" id="saveProfile">Сохранить изменения</button></div><div class="panel-card"><div class="contact-name" style="margin-bottom:10px">Внешний вид</div><div class="setting-row"><span>Тёмная тема</span><input class="switch" type="checkbox" id="themeToggle" ${state.theme==="dark"?"checked":""}></div><label class="setting-row" for="languageSelect"><span>Язык интерфейса</span><select class="language-select" id="languageSelect"><option value="ru" ${state.language==="ru"?"selected":""}>Русский</option><option value="en" ${state.language==="en"?"selected":""}>English</option></select></label>${state.user.role==="owner"?`<button class="secondary-btn" style="margin-top:16px;display:flex;align-items:center;gap:9px" id="ownerPanelBtn"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:19px;height:19px;stroke:currentColor;stroke-width:1.8;fill:none"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>Панель владельца</button>`:""}</div></div><div class="panel-card logout-card"><button class="secondary-btn" id="logoutBtn">Выйти из аккаунта</button></div><div class="panel-card"><div class="contact-name">О прототипе</div><p class="page-sub" style="margin:8px 0 0">FAM — прототип. Аккаунты и сообщения существуют только в этом браузере; пароль проверяется локально и не защищён сервером. Серверная база, защищённая авторизация, синхронизация между устройствами и реальная доставка сообщений не подключены.</p></div>`}
+    else if(page==="userProfile"){const person=viewedUser||{name:"Пользователь",login:"user",online:false};const blocked=isBlocked(person.name),canBlock=normalizeUsername(person.login)!==normalizeUsername(state.user.login);html=`<button class="page-back" id="userProfileBack"><svg class="back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Назад</button><h1 class="page-title">Профиль пользователя</h1><div class="panel-card user-profile-card"><div class="user-profile-avatar">${avatar((person.name||"?")[0],person.cls||"")}</div><div class="contact-name user-profile-name">${escapeHTML(person.name)}</div><div class="contact-sub">@${escapeHTML(person.login)}${person.online?(state.language==="en"?" · online":" · в сети"):""}</div><div class="user-profile-actions">${canBlock?`<button class="secondary-btn block-user-btn" id="blockUserBtn">${blocked?"Разблокировать":"Заблокировать"}</button>`:""}${blocked?`<div class="blocked-note">Пользователь заблокирован. Отправка сообщений недоступна.</div>`:""}<button class="secondary-btn" id="returnToChat">Написать</button></div></div>`}
+    else if(page==="groupMembers"){const c=current(),members=c.members||[];html=`<button class="page-back" id="groupBack"><svg class="back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Назад</button><h1 class="page-title">Участники</h1><p class="page-sub">${escapeHTML(c.name)} · ${members.length} участников</p><div class="panel-card"><button class="secondary-btn" id="addGroupPeopleBtn">＋ Добавить участников</button><div class="panel-card group-create-panel" id="addGroupPeoplePanel" hidden><label class="search"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 4.2 4.2"/></svg><input id="addMemberSearch" placeholder="Поиск по юзернейму"></label><div class="group-search-results" id="addMemberResults"></div><div class="selected-member-chips" id="addSelectedMembers"></div><button class="primary-btn" id="confirmGroupPeopleBtn">Добавить выбранных</button></div><div class="group-members">${members.map(name=>{const person=state.contacts.find(x=>x.name===name)||{},login=person.login||(name===state.user.name?state.user.login:name.toLowerCase().replace(/\s/g,"")),cls=person.cls||(name===state.user.name?"a2":"");return `<button class="group-member-button" data-user="${escapeHTML(name)}">${avatar(name[0],cls)}<span class="group-member-meta"><strong>${escapeHTML(name)}${name===state.user.name?" · вы":""}</strong><small>@${escapeHTML(login)}${isPersonOnline(name)?(state.language==="en"?" · online":" · в сети"):""}</small></span></button>`}).join("")}</div></div>`}
+    else if(page==="owner"){html=`<div class="eyebrow">Управление пространством</div><h1 class="page-title">Панель владельца</h1><p class="page-sub">Настройки семейного пространства</p><div class="profile-grid"><div class="panel-card"><button class="setting-row owner-participants-row" id="ownerParticipantsBtn" type="button"><span>Участники</span><strong>${registeredAccounts().length}</strong></button><div class="setting-row"><span>Регистрация</span><button class="pill registration-toggle" id="registrationToggle" type="button" aria-pressed="${state.registrationOpen}" title="Изменить доступность регистрации">${state.registrationOpen?"Открыта":"Закрыта"}</button></div><div class="setting-row"><span>Администратор</span><span class="pill">Владелец</span></div></div><div class="panel-card"><div class="contact-name">Регистрация FAM</div><p class="page-sub" style="margin:8px 0 0">${state.registrationOpen?"Новые участники могут создать аккаунт и сразу войти.":"Регистрация сейчас закрыта. Новые участники не могут создать аккаунт."} Юзернеймы должны быть уникальными и состоять из латинских букв и цифр.</p></div></div>`}
+    else if(page==="ownerMembers"){
+      const users=registeredAccounts();
+      html=`<button class="page-back" id="ownerMembersBack"><svg class="back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Назад</button><h1 class="page-title">Участники</h1><p class="page-sub">${users.length} зарегистрированных аккаунтов</p><div class="panel-card directory-list">${users.map(account=>{const userAvatarMarkup=account.photo?`<div class="avatar ${escapeHTML(account.cls||"")}"><img src="${escapeHTML(account.photo)}" alt="Фото профиля"></div>`:avatar(account.name[0]||"?",account.cls||"");return `<button class="directory-user" type="button" data-user="${escapeHTML(account.name)}">${userAvatarMarkup}<span class="directory-user-meta"><strong>${escapeHTML(account.name)}</strong><small>@${escapeHTML(account.login)}</small></span><span class="pill">${account.role==="owner"?"Владелец":"Участник"}</span></button>`}).join("")||`<p class="page-sub">Зарегистрированных аккаунтов пока нет.</p>`}</div>`
+    }
+    byId("pagePanel").innerHTML=html;const toggle=byId("themeToggle");if(toggle)toggle.onchange=()=>setTheme(toggle.checked?"dark":"light");const language=byId("languageSelect");if(language)language.onchange=()=>setLanguage(language.value);const save=byId("saveProfile");if(save)save.onclick=()=>{const rawUsername=byId("profileUsername").value.trim(),username=normalizeUsername(rawUsername);if(!validUsername(rawUsername)){toast("Юзернейм: только латинские буквы и цифры");return}if(usernameTaken(username,true)){toast("Этот юзернейм уже занят");return}const oldName=state.user.name,oldLogin=state.user.login,newName=byId("profileName").value.trim()||oldName;state.user.name=newName;state.user.login=username;const account=state.accounts.find(a=>normalizeUsername(a.login)===normalizeUsername(oldLogin));if(account){account.name=newName;account.login=username}const ownContact=state.contacts.find(c=>c.name===oldName&&normalizeUsername(c.login)===normalizeUsername(oldLogin));if(ownContact){ownContact.name=newName;ownContact.login=username}refreshSidebarProfile();persist();nav("profile");toast("Профиль обновлён")};const logout=byId("logoutBtn");if(logout)logout.onclick=()=>showAuth("login");const returnToChat=byId("returnToChat");if(returnToChat)returnToChat.onclick=()=>openContactChat(viewedUser.name);const userProfileBack=byId("userProfileBack");if(userProfileBack)userProfileBack.onclick=()=>nav("chats");const groupBack=byId("groupBack");if(groupBack)groupBack.onclick=()=>nav("chats");const blockUser=byId("blockUserBtn");if(blockUser)blockUser.onclick=()=>{const username=normalizeUsername(viewedUser.login);if(state.blockedUsers.includes(username))state.blockedUsers=state.blockedUsers.filter(x=>x!==username);else state.blockedUsers.push(username);persist();if(current().kind==="personal")renderMessages();nav("userProfile")};const addPeopleBtn=byId("addGroupPeopleBtn");if(addPeopleBtn)addPeopleBtn.onclick=()=>{const panel=byId("addGroupPeoplePanel");panel.hidden=!panel.hidden;if(!panel.hidden){selectedAddUsers=new Set();byId("addMemberSearch").value="";refreshPersonPickers()}};const addMemberSearch=byId("addMemberSearch");if(addMemberSearch)addMemberSearch.oninput=refreshPersonPickers;const groupMemberSearch=byId("groupMemberSearch");if(groupMemberSearch)groupMemberSearch.oninput=refreshPersonPickers;const confirmPeople=byId("confirmGroupPeopleBtn");if(confirmPeople)confirmPeople.onclick=()=>{const c=current(),selected=[...selectedAddUsers],added=state.contacts.filter(person=>selected.includes(person.login)&&!c.members.includes(person.name));c.members=[...(c.members||[]),...added.map(person=>person.name)];c.online=`${c.members.length} участников`;c.updatedAt=Date.now();persist();nav("groupMembers");toast(added.length?"Участники добавлены":"Выберите людей для добавления")};const contactSearch=byId("contactSearch");if(contactSearch)contactSearch.oninput=()=>{byId("contactRows").innerHTML=contactRows(contactSearch.value);bindContactButtons(byId("contactRows"))};bindContactButtons(byId("contactRows")||document);const newGroup=byId("newGroupBtn");if(newGroup)newGroup.onclick=()=>{const box=byId("groupCreatePanel");box.hidden=!box.hidden;if(!box.hidden){selectedGroupUsers=new Set();byId("groupMemberSearch").value="";refreshPersonPickers();byId("groupName").focus()}};const cancelGroup=byId("cancelGroupBtn");if(cancelGroup)cancelGroup.onclick=()=>byId("groupCreatePanel").hidden=true;const createGroup=byId("createGroupBtn");if(createGroup)createGroup.onclick=()=>{const name=byId("groupName").value.trim(),selected=[...selectedGroupUsers],people=state.contacts.filter(person=>selected.includes(person.login));if(!name){toast("Введите название группы");return}if(!people.length){toast("Добавьте хотя бы одного участника");return}const id=`group-${Date.now()}`,members=[state.user.name,...people.map(person=>person.name)],group={id,name,kind:"group",avatar:name[0],cls:"a3",time:"сейчас",preview:"Группа создана",unread:0,online:`${members.length} участников`,members,updatedAt:Date.now()};state.chats.unshift(group);state.messages[id]=[];persist();selectChat(id)};const ownerPanel=byId("ownerPanelBtn");if(ownerPanel)ownerPanel.onclick=()=>nav("owner");}
   function setTheme(theme){state.theme=theme;document.documentElement.classList.toggle("dark",theme==="dark");persist()}
-  function showAuth(mode){const layer=byId("authLayer");layer.classList.add("open");renderAuth(mode)}
+  function setLanguage(language){state.language=language==="en"?"en":"ru";document.documentElement.lang=state.language;persist();refreshSidebarProfile();renderChats();renderMessages(true);if(activePage!=="chats")renderPage(activePage);translateDom(document.body)}
+  function showAuth(mode){const layer=byId("authLayer");openPopup(layer);renderAuth(mode)}
   async function passwordDigest(value){
     if(!globalThis.crypto?.subtle)throw new Error("Secure hashing is unavailable");
     const bytes=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(value));
     return Array.from(new Uint8Array(bytes),byte=>byte.toString(16).padStart(2,"0")).join("");
   }
   function renderAuth(mode){
-    const register=mode==="register",content=byId("authContent"),layer=byId("authLayer");
-    content.innerHTML=`<p>${register?"Создайте аккаунт FAM. После регистрации вы сразу войдёте.":"ВХОД"}</p><form class="form" id="authForm" novalidate>${register?`<label class="field"><span>Ваше имя</span><input name="name" placeholder="Например, Мария" autocomplete="name"></label>`:""}<label class="field"><span>Юзернейм</span><input name="login" placeholder="Ваш юзернейм" autocomplete="username" autocapitalize="none" spellcheck="false"></label><label class="field"><span>Пароль</span><input name="password" type="password" placeholder="Не менее 8 символов" autocomplete="${register?"new-password":"current-password"}"></label>${register?`<label class="field"><span>Подтвердите пароль</span><input name="confirmPassword" type="password" placeholder="Повторите пароль" autocomplete="new-password"></label>`:""}<button class="primary-btn">${register?"Зарегистрироваться":"Войти"}</button></form><button class="auth-switch" id="authSwitch">${register?"Уже есть аккаунт? Войти":"Нет аккаунта? Зарегистрироваться"}</button><div class="auth-notice" id="authNotice" role="status" aria-live="polite"></div>${!register?`<button class="auth-switch" id="demoLogin">Продолжить как демонстрационный владелец</button>`:""}`;
-    byId("authSwitch").onclick=()=>renderAuth(register?"login":"register");
-    if(byId("demoLogin"))byId("demoLogin").onclick=()=>{const ownerAccount=state.accounts.find(account=>account.role==="owner")||{name:"Александр",login:"alex",role:"owner"};state.user={...ownerAccount};persist();refreshSidebarProfile();layer.classList.remove("open");toast("Демо-вход: Александр")};
+    const register=mode==="register"&&state.registrationOpen,content=byId("authContent"),layer=byId("authLayer");
+    const registrationControl=register?`<button class="auth-switch" id="authSwitch">Уже есть аккаунт? Войти</button>`:state.registrationOpen?`<button class="auth-switch" id="authSwitch">Нет аккаунта? Зарегистрироваться</button>`:`<p class="auth-registration-closed">Регистрация закрыта владельцем.</p>`;
+    content.innerHTML=`<p>${register?"Создайте аккаунт FAM. После регистрации вы сразу войдёте.":"ВХОД"}</p><form class="form" id="authForm" novalidate>${register?`<label class="field"><span>Ваше имя</span><input name="name" placeholder="Например, Мария" autocomplete="name"></label>`:""}<label class="field"><span>Юзернейм</span><input name="login" placeholder="Ваш юзернейм" autocomplete="username" autocapitalize="none" spellcheck="false"></label><label class="field"><span>Пароль</span><input name="password" type="password" placeholder="Не менее 8 символов" autocomplete="${register?"new-password":"current-password"}"></label>${register?`<label class="field"><span>Подтвердите пароль</span><input name="confirmPassword" type="password" placeholder="Повторите пароль" autocomplete="new-password"></label>`:""}<button class="primary-btn">${register?"Зарегистрироваться":"Войти"}</button></form>${registrationControl}<div class="auth-notice" id="authNotice" role="status" aria-live="polite"></div>${!register?`<button class="auth-switch" id="demoLogin">Продолжить как демонстрационный владелец</button>`:""}`;
+    const authSwitch=byId("authSwitch");if(authSwitch)authSwitch.onclick=()=>renderAuth(register?"login":"register");
+    if(byId("demoLogin"))byId("demoLogin").onclick=()=>{const ownerAccount=state.accounts.find(account=>account.role==="owner")||{name:"Александр",login:"alex",role:"owner"};state.user={...ownerAccount};persist();refreshSidebarProfile();closePopup(layer);toast("Демо-вход: Александр")};
     byId("authForm").onsubmit=async e=>{
       e.preventDefault();
       const data=new FormData(e.currentTarget),rawUsername=String(data.get("login")||"").trim(),login=normalizeUsername(rawUsername),password=String(data.get("password")||""),notice=byId("authNotice");
       notice.textContent="";notice.classList.remove("show");
       const warn=message=>{notice.textContent=message;notice.classList.add("show")};
+      if(register&&!state.registrationOpen){warn("Регистрация закрыта владельцем.");return}
       if(register&&!String(data.get("name")||"").trim()){warn("Введите ваше имя.");return}
       if(!validUsername(rawUsername)){warn("Юзернейм может содержать только латинские буквы и цифры.");return}
       if(password.length<8){warn("Пароль должен содержать минимум 8 символов.");return}
@@ -639,13 +884,13 @@
       if(register){
         if(usernameTaken(login)){warn("Этот юзернейм уже занят. Выберите другой.");return}
         const name=String(data.get("name")).trim()||login,account={name,login,role:"member",passwordHash};
-        state.accounts.push(account);state.contacts.push({name,login,cls:"a1"});state.user={name,login,role:"member"};persist();layer.classList.remove("open");refreshSidebarProfile();renderChats();toast("Аккаунт создан. Добро пожаловать в FAM!");
+        state.accounts.push(account);state.contacts.push({name,login,cls:"a1"});state.user={name,login,role:"member"};persist();closePopup(layer);refreshSidebarProfile();renderChats();toast("Аккаунт создан. Добро пожаловать в FAM!");
       }else{
         const account=state.accounts.find(a=>normalizeUsername(a.login)===login);
-        if(!account){warn("Аккаунт не найден. Зарегистрируйтесь, чтобы войти.");return}
+        if(!account){warn(state.registrationOpen?"Аккаунт не найден. Зарегистрируйтесь, чтобы войти.":"Аккаунт не найден. Регистрация закрыта.");return}
         if(!account.passwordHash){warn("Для демо-аккаунта используйте кнопку демонстрационного входа.");return}
         if(account.passwordHash!==passwordHash){warn("Неверный пароль.");return}
-        state.user={name:account.name,login:account.login,role:account.role||"member"};persist();layer.classList.remove("open");refreshSidebarProfile();toast("Вы вошли в FAM");
+        state.user={name:account.name,login:account.login,role:account.role||"member"};persist();closePopup(layer);refreshSidebarProfile();toast("Вы вошли в FAM");
       }
     };
   }
@@ -664,12 +909,12 @@
       preview.style.width=`${width}px`;preview.style.height=`${height}px`;preview.style.left=`${left}px`;preview.style.top=`${top}px`;
     };
     const cleanup=()=>{
-      if(closed)return;closed=true;URL.revokeObjectURL(sourceUrl);backdrop.classList.remove("open");backdrop.onclick=null;document.removeEventListener("keydown",onKeyDown);
+      if(closed)return;closed=true;URL.revokeObjectURL(sourceUrl);closePopup(backdrop);backdrop.onclick=null;document.removeEventListener("keydown",onKeyDown);
       byId("avatarFile").value="";
     };
     const cancel=()=>cleanup();
     const onKeyDown=event=>{if(event.key==="Escape")cancel()};
-    layout();backdrop.classList.add("open");backdrop.onclick=event=>{if(event.target===backdrop)cancel()};document.addEventListener("keydown",onKeyDown);
+    layout();openPopup(backdrop);backdrop.onclick=event=>{if(event.target===backdrop)cancel()};document.addEventListener("keydown",onKeyDown);
     byId("cancelAvatarCrop").onclick=cancel;
     zoomControl.oninput=()=>{
       const nextZoom=Number(zoomControl.value),ratio=nextZoom/zoom;
@@ -695,7 +940,7 @@
     image.onerror=()=>{URL.revokeObjectURL(sourceUrl);event.target.value="";toast("Не удалось открыть это изображение")};
     image.src=sourceUrl;
   });
-  migrateLegacyTimestamps();persist();byId("railName").textContent=state.user.name;refreshSidebarProfile();setTheme(state.theme);renderChats();renderMessages();nav("chats");
+  migrateLegacyTimestamps();persist();byId("railName").textContent=state.user.name;refreshSidebarProfile();setTheme(state.theme);renderChats();renderMessages();nav("chats");translateDom(document.body);
   </script>
 </body>
 </html>
